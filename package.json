@@ -1,0 +1,32 @@
+{
+  "name": "Regex",
+  "description": "Enhanced Regular Expressions",
+  "author": {
+    "name": "Alexander Kit",
+    "email": "alex.kit@atmajs.com"
+  },
+  "version": "0.2.20",
+  "main": "./lib/ruta.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/atmajs/Ruta.git"
+  },
+  "devDependencies": {
+    "atma": ">0.8.0",
+    "atma-loader-babel": "^1.0.19"
+  },
+  "scripts": {
+    "test": "atma test"
+  },
+  "license": "MIT",
+  "atma": {
+    "plugins": [
+      "atma-loader-babel"
+    ],
+    "settings": {
+      "atma-loader-babel": {
+        "extensions": ["test", "es6"]
+      }
+    }
+  }
+}

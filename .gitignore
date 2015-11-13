@@ -1,0 +1,8 @@
+# build
+/lib/*
+
+# node
+node_modules
+
+# WebStorm
+.idea
