@@ -10,14 +10,17 @@ Better JavaScript Regular Expression Library
 ### Features
 
 - Named Groups `(?<name>expression)`, `(?'name'expression)`
-    
+
     ```javascript
     var rgx = new Regex('Name:\\s*(?<name>\\w+)');
     var match = rgx.exec('My Name: Baz');
     equals(match.groups.name, 'Baz');
     ```
 
+- Comment Groups `(?# my comment)`
+    
+- Atomic Groups `(?>ab|c)`
+
 - Options
     + `x` : `(?x) \\d #comment`
     + `i` : `a(?i)b(?-i)c`
-        

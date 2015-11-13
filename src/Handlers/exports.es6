@@ -5,8 +5,10 @@ var Handlers;
 	// import JsNoneCapturedGroup.es6
 	// import AtomicGroup.es6
 	// import NamedGroup.es6
+	// import CommentGroup.es6
 
 	var GroupHandlers = [
+		CommentGroup,
 		JsNoneCapturedGroup,
 		NamedGroup,
 		AtomicGroup

@@ -1,0 +1,17 @@
+UTest({
+	'should remove comment groups' () {
+		[
+			"(?# hello bob)F(?# some)o",
+			`(?#
+				Multi line
+			  )Fo(?#
+
+				  comment)`,
+		]
+		.forEach(str => {
+			var rgx = new Regex(str);
+			var match = rgx.exec('BazFoo');
+			deepEq_(Array.from(match), ['Fo']);
+		});
+	}
+});
