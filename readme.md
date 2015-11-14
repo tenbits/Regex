@@ -17,8 +17,10 @@ Better JavaScript Regular Expression Library
     equals(match.groups.name, 'Baz');
     ```
 
+- Named Backreferences `\k<name>`, `\k'name'`
+
 - Comment Groups `(?# my comment)`
-    
+
 - Atomic Groups `(?>ab|c)`
 
 - Options

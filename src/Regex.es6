@@ -21,6 +21,8 @@ class Regex {
 		ast_defineHandlers(root);
 		ast_indexGroups(root);
 
+		Handlers.afterIndexed(root);
+
 		ast_combineNatives(root);
 		ast_createBlocks(root);
 

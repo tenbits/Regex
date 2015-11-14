@@ -69,15 +69,13 @@ var ast_combineNatives,
 			if (Handler == null) {
 				return;
 			}
-
 			if (Handler.transform) {
-				return Handler.transform(node);
+				return Handler.transform(node, root);
 			}
 			if (Handler.create) {
-				el = Handler.create(node);
-				transformer_replaceNode(node, el);
+				el = Handler.create(node, root);
+				return transformer_replaceNode(node, el);
 			}
-			return;
 		});
 	};
 

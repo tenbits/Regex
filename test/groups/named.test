@@ -21,5 +21,18 @@ UTest({
 			var match = rgx.exec('some aBtram42C');
 			eq_(match.groups.num, '42');
 		});
+	},
+	'should match backreference' () {
+		[
+			"(?<me>a|b)hello\\k<me>",
+			"(?'me'a|b)hello\\k'me'",
+			"(?'me'a|b)hello\\k<me>",
+		]
+		.forEach(str => {
+			var rgx = new Regex(str);
+			var match = rgx.exec('some ahelloa baz');
+			deepEq_(Array.from(match), ['ahelloa', 'a']);
+			eq_(match.groups.me, 'a');
+		});
 	}
 });
