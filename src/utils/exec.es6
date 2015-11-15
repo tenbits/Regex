@@ -1,4 +1,6 @@
-var exec_root;
+var exec_root,
+	exec_children,
+	exec_clearCursors;
 (function(){
 
 	exec_root = function (root, str, i) {
@@ -16,12 +18,13 @@ var exec_root;
 		return match;
 	};
 
-	var exec_children = function(node, str, i, opts_) {
-		var el, matches = [], backtracking = [], opts = new Opts(opts_);
+	exec_children = function(node, str, i, opts_, cursor) {
+		var matches = [], backtracking = [], opts = new Opts(opts_);
 
-		for(el = node.firstChild; el != null;) {
+		var el = cursor || node.firstChild;
+		while(el != null) {
 			var matcher = Matchers[el.type];
-			var match = matcher(el, str, i, opts);
+			var match = el.exec ? el.exec(str, i, opts) : matcher(el, str, i, opts);
 			if (match == null) {
 				if (backtracking.length === 0) {
 					return null;
@@ -50,6 +53,8 @@ var exec_root;
 		}
 		return matches_join(matches);
 	};
+
+	exec_clearCursors = backtrack_clearCursors;
 
 	var Backtrack = function(strI, matchI, el, opts) {
 		this.strI = strI;
@@ -89,8 +94,9 @@ var exec_root;
 			if (match == null) {
 				return null;
 			}
-
-			match.unshift(match[0]);
+			if (group.isCaptured !== false) {
+				match.unshift(match[0]);
+			}
 			return match;
 
 			//for(var el = group.parentNode; el != null ; el = el.parentNode) {

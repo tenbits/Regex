@@ -52,6 +52,9 @@ var ast_combineNatives,
 	ast_indexGroups = function(root) {
 		var index = 0;
 		visitor_walkByType(root, Node.GROUP, node => {
+			if (node.isCaptured === false) {
+				return;
+			}
 			node.index = ++index;
 			if (node.name != null) {
 
@@ -73,8 +76,11 @@ var ast_combineNatives,
 				return Handler.transform(node, root);
 			}
 			if (Handler.create) {
-				el = Handler.create(node, root);
-				return transformer_replaceNode(node, el);
+				var el = Handler.create(node, root);
+				return transformer_replaceNode(node, el, false);
+			}
+			if (Handler.process) {
+				return Handler.process(node, root);
 			}
 		});
 	};
@@ -221,6 +227,7 @@ var ast_combineNatives,
 		return true;
 	};
 	function compileNatives(root) {
+
 		visitor_walk(root, function(node) {
 			if (node.type !== Node.LITERAL) {
 				return;

@@ -1,0 +1,19 @@
+UTest({
+	'should match positive lookbehind' () {
+
+		var rgx = new Regex('(?<=a)([pr])');
+		var match = rgx.exec('cbagpdapr');
+
+		deepEq_(Array.from(match), ['p', 'p']);
+		eq_(match.index, 7);
+	},
+	'should match negative lookbehind' () {
+
+		var rgx = new Regex('(?<!a)([pr])');
+		var match = rgx.exec('cbapdagpr');
+
+		deepEq_(Array.from(match), ['p', 'p']);
+		eq_(match.index, 7);
+	}
+
+})

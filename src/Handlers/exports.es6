@@ -7,12 +7,14 @@ var Handlers;
 	// import NamedGroup.es6
 	// import NamedBackreference.es6
 	// import CommentGroup.es6
+	// import LookbehindGroup.es6
 
 	var GroupHandlers = [
 		CommentGroup,
 		JsNoneCapturedGroup,
 		NamedGroup,
-		AtomicGroup
+		AtomicGroup,
+		LookbehindGroup
 	];
 	var LiteralHandlers = [
 

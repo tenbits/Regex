@@ -11,9 +11,4 @@ var RegexNode = class_create(Literal, {
 		this.index = node.index;
 	},
 
-	exec (str, i) {
-		this.regex.lastIndex = i;
-		var match = this.regex.exec(str);
-		return match;
-	}
 });

@@ -23,6 +23,8 @@ Better JavaScript Regular Expression Library
 
 - Atomic Groups `(?>ab|c)`
 
+- Positive-/Negative Lookbehind `(?<=expression)` `(?<!expression)`
+
 - Options
     + `x` : `(?x) \\d #comment`
     + `i` : `a(?i)b(?-i)c`
