@@ -14,8 +14,10 @@ var RegexNode;
 		constructor (text, node) {
 			var flags = node.serializeFlags();
 			this.rgxSearch = new RegExp(this.textContent, flags);
-			this.rgxFixed = new RegExp('^' + this.textContent, flags.replace('g', ''));
-			this.compileIndexer();
+
+			flags = flags.replace('g', '');
+			this.rgxFixed = new RegExp('^' + this.textContent, flags);
+			this.compileIndexer(flags);
 			this.groupIndex = node.index;
 		},
 
@@ -41,10 +43,10 @@ var RegexNode;
 			return this.resolveMatches(match, matchIndex);
 		},
 
-		resolveMatches (nativeMatch, pos) {
+		resolveMatches (nativeMatch, matchIndex) {
 			var match = new Match();
 			match.value = nativeMatch[0];
-			match.index = nativeMatch.index;
+			match.index = matchIndex;
 			match.groupIndex = this.groupIndex;
 
 
@@ -53,17 +55,21 @@ var RegexNode;
 				throw Error(`Indexer root missmatch ${nativeIndexerMatch[0]} ${match.value}`);
 			}
 
-			this.domIndexer.pos = pos;
+			this.domIndexer.pos = matchIndex;
 			this.domIndexer.match = match.value;
 
 			visitor_walk(this.domIndexer, node => {
+				if (node.type === Node.OR) {
+					node.pos = node.parentNode.pos;
+				}
 				if (node.shadowIndex == null) {
 					return;
 				}
 				node.value = nativeIndexerMatch[node.shadowIndex];
 				var prev = node.previousSibling;
 				if (prev != null) {
-					node.pos = prev.pos + prev.value.length;
+					var length = prev.value == null ? 0 : prev.value.length;
+					node.pos = prev.pos + length;
 					return;
 				}
 				node.pos = node.parentNode.pos;
@@ -84,14 +90,13 @@ var RegexNode;
 				group.index = node.pos;
 				match.groups[node.index - 1] = group;
 			});
-
 			return match;
 		},
 		resolveMatch (str, group, groupIndex) {
 			var match = this.rgxIndexer.exec(str);
 		},
 
-		compileIndexer () {
+		compileIndexer (flags) {
 			var root = parser_parseGroups(this.textContent);
 			ast_defineHandlers(root);
 
@@ -110,7 +115,6 @@ var RegexNode;
 					}
 				}
 
-
 				var group = new Node.Group();
 				group.isShadowGroup = true;
 
@@ -122,9 +126,8 @@ var RegexNode;
 
 			ast_indexShadowedGroups(root);
 
-			console.log(root.toString());
 			this.domIndexer = root;
-			this.rgxIndexer = new RegExp(root.toString());
+			this.rgxIndexer = new RegExp(root.toString(), flags);
 		}
 	});
 }())

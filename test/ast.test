@@ -11,7 +11,7 @@ UTest({
 			eq_(root.firstChild, root.lastChild);
 		});
 	},
-	'!should transform custom syntax' () {
+	'should transform custom syntax' () {
 		[
 			[
 				`(?x)

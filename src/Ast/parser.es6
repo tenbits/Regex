@@ -18,6 +18,7 @@ var parser_parseGroups;
 			c = str.charCodeAt(i);
 
 			if (c === 92) {
+				state = state_LITERAL;
 				// \ Escape next character
 				++i;
 				continue;

@@ -4,13 +4,32 @@ UTest({
 			regex: 'a(bc|b)c',
 			input: 'abcc',
 			index: 0,
-			match: ['abcc', 'bc']
+			match: {
+				value: 'abcc',
+				index: 0,
+				groups: [
+					{
+						value: 'bc',
+						index: 1
+					}
+				]
+			}
 		});
+
 		Assert({
 			regex: 'a(?>bc|b)c',
 			input: 'abcc',
 			index: 0,
-			match: ['abcc', 'bc']
+			match: {
+				value: 'abcc',
+				index: 0,
+				groups: [
+					{
+						value: 'bc',
+						index: 1
+					}
+				]
+			}
 		});
 	},
 	'should once match and fail' () {
@@ -18,7 +37,16 @@ UTest({
 			regex: 'a(bc|b)c',
 			input: 'abc',
 			index: 0,
-			match: ['abc', 'b']
+			match: {
+				value: 'abc',
+				index: '0',
+				groups: [
+					{
+						value: 'b',
+						index: 1
+					}
+				]
+			}
 		});
 		Assert({
 			regex: 'a(?>bc|b)c',
@@ -37,8 +65,5 @@ function Assert(data) {
 		return;
 	}
 
-	eq_(match.index, data.index);
-
-	var arr = Array.from(match);
-	deepEq_(arr, data.match);
+	deepEq_(match, data.match);
 }

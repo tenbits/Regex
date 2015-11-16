@@ -95,7 +95,10 @@ var exec_root,
 				return null;
 			}
 			if (group.isCaptured !== false) {
-				match.unshift(match[0]);
+				var group = new MatchGroup();
+				group.value = match.value;
+				group.index = match.index;
+				match.groups.unshift(group);
 			}
 			return match;
 
@@ -146,32 +149,6 @@ var exec_root,
 		visitor_walkUp(node, x => x.cursor = null);
 	};
 
-
-	function matches_joinOld(matches) {
-		var str = '';
-		var out = [];
-
-		var i = -1,
-			imax = matches.length;
-
-		while(++i < imax) {
-			var match = matches[i],
-				j = 0,
-				jmax = match.length;
-
-			str += match[0];
-
-			while( ++j < jmax ) {
-				var x = match[j];
-				if (x != null) {
-					out[j] = x;
-				}
-			}
-		}
-		out[0] = str;
-		out.index = matches[0].index;
-		return out;
-	}
 	function matches_join(matches) {
 		var str = '';
 		var out = new Match();
@@ -191,11 +168,12 @@ var exec_root,
 
 			if (match.groupIndex != null) {
 				var groups = match.groups;
-				var length = match.groupIndex + groups.length - 1;
-				if (out.groups.length < length) {
-					out.groups.length = length;
+				var pos = match.groupIndex - 1;
+				var length = pos + groups.length - 1;
+				while (out.groups.length < length) {
+					out.groups[out.groups.length++] = null;
 				}
-				out.groups.splice(match.groupIndex, 0, ...groups);
+				out.groups.splice(pos, 0, ...groups);
 				continue;
 			}
 			out.groups = out.groups.concat(match.groups);

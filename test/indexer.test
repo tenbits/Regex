@@ -10,11 +10,12 @@ UTest({
 	'repeated group position' () {
 		var rgx = new Regex('(ba)+.(a*)');
 		var match = rgx.exec('babaaaaa');
-		eq_(match[1].match, 'ba');
-		eq_(match[1].index, 0);
+		eq_(match.value, 'babaaaaa');
+		eq_(match.groups[0].value, 'ba');
+		eq_(match.groups[0].index, 0);
 
-		eq_(match[2].match, 'aaa');
-		eq_(match[2].index, 5);
+		eq_(match.groups[1].value, 'aaa');
+		eq_(match.groups[1].index, 5);
 	},
 	'not captured group at the end' () {
 		var rgx = new Regex('\\w+(a)(?:a)');
@@ -30,10 +31,10 @@ UTest({
 		var rgx = new Regex('\\w+(?:a)(a)');
 		var match = rgx.exec('abcaa');
 
-		eq_(match[0].match, 'abcaa');
-		eq_(match[0].index, 0);
+		eq_(match.value, 'abcaa');
+		eq_(match.index, 0);
 
-		eq_(match[1].match, 'a');
-		eq_(match[1].index, 4);
+		eq_(match.groups[0].value, 'a');
+		eq_(match.groups[0].index, 4);
 	}
 })

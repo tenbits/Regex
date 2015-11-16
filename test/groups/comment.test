@@ -11,7 +11,11 @@ UTest({
 		.forEach(str => {
 			var rgx = new Regex(str);
 			var match = rgx.exec('BazFoo');
-			deepEq_(Array.from(match), ['Fo']);
+			deepEq_(match, {
+				value: 'Fo',
+				index: 3,
+				groups: []
+			});
 		});
 	}
 });

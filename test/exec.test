@@ -1,31 +1,72 @@
 UTest({
 
 	'should match natives' () {
-		[{
+		[
+			{
 				regex: 'foo',
 				input: 'asdfoooo',
-				index: 3,
-				match: ['foo']
-			}, {
+				match: {
+					value: 'foo',
+					index: 3,
+					groups: []
+				}
+			},
+			{
 				regex: '[\\d]+',
 				input: 'asdf145oooo',
-				index: 4,
-				match: ['145']
-			}, {
+				match: {
+					value: '145',
+					index: 4,
+					groups: []
+				}
+			},
+			{
 				regex: '(?:a)d',
 				input: 'cdad',
-				index: 2,
-				match: ['ad']
-			}, {
+				match: {
+					value: 'ad',
+					index: 2,
+					groups: []
+				}
+			},
+			{
 				regex: '(?:a)d|(c)',
 				input: 'fdgdc',
 				index: 4,
-				match: ['c', 'c']
-			}, {
+				match: {
+					value: 'c',
+					index: 4,
+					groups: [{
+						value: 'c',
+						index: 4
+					}]
+				}
+			},
+			{
 				regex: 'd|((g|(b|(a|c))))',
 				input: 'oiac',
-				index: 2,
-				match: ["a", "a", "a", "a", "a"]
+				match: {
+					value: 'a',
+					index: 2,
+					groups: [
+						{
+							value: 'a',
+							index: 2,
+						},
+						{
+							value: 'a',
+							index: 2,
+						},
+						{
+							value: 'a',
+							index: 2,
+						},
+						{
+							value: 'a',
+							index: 2,
+						}
+					]
+				}
 			}
 		]
 			.forEach(Assert);
@@ -41,8 +82,11 @@ UTest({
 						\\ d
 					`,
 					input: 'abccb1s',
-					index: 4,
-					match: ['b1']
+					match: {
+						value: 'b1',
+						index: 4,
+						groups: []
+					}
 				}
 			].forEach(Assert);
 		},
@@ -51,44 +95,103 @@ UTest({
 				{
 					regex: '(?i)bob|Foo',
 					input: 'afOOBob',
-					index: 1,
-					match: ['fOO']
+					match: {
+						value: 'fOO',
+						index: 1,
+						groups: []
+					}
 				},
 				{
 					regex: '(?i)bob|(?-i)Foo',
 					input: 'afOOBob',
 					index: 4,
-					match: ['Bob']
+					match: {
+						value: 'Bob',
+						index: 4,
+						groups: []
+					}
 				},
 				{
 					regex: '((?i)bob)|Foo',
 					input: 'afOOBob',
-					index: 4,
-					match: ['Bob', 'Bob']
+					match: {
+						value: 'Bob',
+						index: 4,
+						groups: [
+							{
+								value: 'Bob',
+								index: 4
+							}
+						]
+					}
 				},
 				{
 					regex: '((?i)bob)|(f[oO]+)',
 					input: 'afOOBob',
 					index: 1,
-					match: ['fOO', null, 'fOO']
+					match: {
+						value: 'fOO',
+						index: 1,
+						groups: [
+							null,
+							{
+								value: 'fOO',
+								index: 1
+							}
+						]
+					}
 				},
 				{
 					regex: '((?i)\\d+)\\s*((?i)PARTY) in (\\w+)',
 					input: 'New Year 2015 Party in London',
 					index: 9,
-					match: ['2015 Party in London', '2015', 'Party', 'London']
+					match: {
+						value:'2015 Party in London',
+						index: 9,
+						groups:[
+							{
+								value: '2015',
+								index: 9,
+							},
+							{
+								value: 'Party',
+								index: 14,
+							},
+							{
+								value: 'London',
+								index: 23
+							}]
+					}
 				},
 				{
 					regex: 'a((?i)bc|b)c',
 					input: 'abCc',
 					index: 0,
-					match: ['abCc', 'bC']
+					match: {
+						value: 'abCc',
+						index: 0,
+						groups:[
+							{
+								value: 'bC',
+								index: 1
+							}
+						]
+					}
 				},
 				{
 					regex: 'a((?i)bc|b)c',
 					input: 'aBc',
 					index: 0,
-					match: ['aBc', 'B']
+					match: {
+						value: 'aBc',
+						index: 0,
+						groups: [
+							{
+								value: 'B',
+								index: 1
+							}
+						]
+					}
 				}
 			]
 				.forEach(Assert);
@@ -103,8 +206,5 @@ function Assert(data) {
 		throw Error('Pattern shoud be matched: ' + data.regex);
 	}
 
-	eq_(match.index, data.index);
-
-	var arr = Array.from(match);
-	deepEq_(arr, data.match);
+	deepEq_(match, data.match);
 }
