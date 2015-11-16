@@ -19,9 +19,10 @@ var LookbehindGroup;
 			dom_removeChild(node);
 			dom_prependChild(lookbehind, node);
 
-			var txt = node.firstChild.textContent;
-			node.firstChild.textContent = '(' + txt.substring(3) + ')$';
-
+			visitor_walkByType(node, Node.LITERAL, x => {
+				var txt = x.textContent;
+				x.textContent = '(' + txt.replace(rgx_LBGroup, '') + ')$';
+			});
 			return lookbehind;
 		},
 

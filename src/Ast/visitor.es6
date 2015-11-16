@@ -25,7 +25,7 @@ var visitor_firstLiteral,
 	visitor_walkByType = function(root, type, fn) {
 		walk(walk_DOWN, root, x => {
 			if (x.type === type) {
-				fn(x);
+				return fn(x);
 			}
 		});
 	};
@@ -40,9 +40,7 @@ var visitor_firstLiteral,
 		while(el != null) {
 			if (direction === walk_DOWN) {
 				next = fn(el);
-				if (next == null) {
-					walk(direction, el, fn);
-				}
+				walk(direction, next || el, fn);
 			}
 			else {
 				walk(direction, el, fn);

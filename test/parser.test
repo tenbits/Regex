@@ -1,18 +1,17 @@
 UTest({
 	'should parse a letter' () {
 		var root = Regex.parseGroups('B');
-		var groups = root.nodes;
-		eq_(groups.length, 1);
-		eq_(groups[0].text, 'B');
+		var literal = root.firstChild;
+		eq_(literal.textContent, 'B');
 	},
 	'should parse groups' () {
 		var root = Regex.parseGroups('(?<=Foo)Bar(?!Qux)|dipsi');
-		var groups = root.nodes;
+		var groups = root.getChildren();
 
-		eq_(groups[0].nodes[0].text, '?<=Foo');
-		eq_(groups[1].text, 'Bar');
-		eq_(groups[2].nodes[0].text, '?!Qux');
+		eq_(groups[0].getChildren()[0].textContent, '?<=Foo');
+		eq_(groups[1].textContent, 'Bar');
+		eq_(groups[2].getChildren()[0].textContent, '?!Qux');
 		eq_(groups[3].type, 3);
-		eq_(groups[4].text, 'dipsi');
+		eq_(groups[4].textContent, 'dipsi');
 	},
 })
