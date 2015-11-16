@@ -1,6 +1,7 @@
 var ast_combineNatives,
 	ast_compileNatives,
 	ast_indexGroups,
+	ast_indexShadowedGroups,
 	ast_createBlocks,
 	ast_defineHandlers,
 	ast_resolveBacktracks;
@@ -56,6 +57,27 @@ var ast_combineNatives,
 				return;
 			}
 			node.index = ++index;
+			if (node.name != null) {
+
+				if (root.groups == null)
+					root.groups = {};
+
+				root.groups[node.name] = node.index;
+			}
+		});
+	};
+
+	ast_indexShadowedGroups = function(root) {
+		var index = 0, shadowIndex = 0;
+		visitor_walkByType(root, Node.GROUP, node => {
+			if (node.isCaptured === false) {
+				return;
+			}
+			if (node.isShadowGroup !== true) {
+				node.index = ++index;
+			}
+			node.shadowIndex = ++shadowIndex;
+
 			if (node.name != null) {
 
 				if (root.groups == null)

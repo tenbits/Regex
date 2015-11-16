@@ -45,8 +45,8 @@ var exec_root,
 				));
 			}
 			i = opts.fixed
-				? i + match[0].length
-				: i + match[0].length + match.index;
+				? i + match.value.length
+				: i + match.value.length + match.index;
 			matches.push(match);
 			opts.fixed = true;
 			el = el.nextSibling;
@@ -174,7 +174,10 @@ var exec_root,
 	}
 	function matches_join(matches) {
 		var str = '';
-		var out = [ str ];
+		var out = new Match();
+
+		out.value = '';
+		out.index = matches[0].index;
 
 		var i = -1,
 			imax = matches.length;
@@ -182,24 +185,22 @@ var exec_root,
 		while(++i < imax) {
 			var match = matches[i],
 				j = 0,
-				jmax = match.length;
+				jmax = match.groups.length;
 
-			str += match[0];
+			out.value += match.value;
 
 			if (match.groupIndex != null) {
-				var groups = match.splice(1);
+				var groups = match.groups;
 				var length = match.groupIndex + groups.length - 1;
-				if (out.length < length) {
-					out.length = length;
+				if (out.groups.length < length) {
+					out.groups.length = length;
 				}
-				out.splice(match.groupIndex, 0, ...groups);
+				out.groups.splice(match.groupIndex, 0, ...groups);
 				continue;
 			}
-			out = out.concat(match.slice(1));
+			out.groups = out.groups.concat(match.groups);
 		}
 
-		out[0] = str;
-		out.index = matches[0].index;
 		return out;
 	}
 }());

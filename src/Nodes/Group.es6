@@ -5,21 +5,27 @@ var Group = class_create(AstNode, {
 
 	name: null,
 
-	constructor (parent) {
-		this.nodes = [];
-	},
-	append (node) {
-		this.nodes.push(node);
-	},
+	repetition: '',
+	greedy: null,
+
+	pos: null,
+	value: null,
 
 	toString () {
-		var str = '',
+		var str = '(',
 			el = this.firstChild;
 
 		while(el != null) {
 			str += el.toString();
 			el = el.nextSibling;
 		}
-		return '(' + str + ')';
+		str += ')';
+		if (this.repetition != null) {
+			str += this.repetition;
+		}
+		if (this.greedy === false) {
+			str += '?';
+		}
+		return str;
 	}
 });

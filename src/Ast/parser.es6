@@ -1,12 +1,17 @@
 var parser_parseGroups;
 (function(){
 
+	var state_LITERAL = 1,
+		state_GROUP_START = 2,
+		state_GROUP_END = 3;
+
 	parser_parseGroups = function (str) {
 		var root = new Node.Root(),
 			imax = str.length,
 			i = -1,
 			lastI = 0,
 			current = root,
+			state,
 			c;
 
 		while( ++i < imax ) {
@@ -18,7 +23,34 @@ var parser_parseGroups;
 				continue;
 			}
 
+			if (state === state_GROUP_END && (c === 63 || c === 42 || c === 43 || c === 123)) {
+				//?*+{
+				var repetition, greedy = true;
+				if (i === 123) {
+					var end = str.indexOf('}', i);
+					repetition = str.substring(i, end + 1);
+					i = end;
+				} else {
+					repetition = str[i];
+					if (i < imax - 1) {
+						c = str.charCodeAt(i + 1);
+						if (c === 63) {
+							greedy = false;
+							i++;
+						}
+					}
+				}
+				var group = current.lastChild;
+				group.repetition = repetition;
+				group.greedy = greedy;
+				state = state_LITERAL;
+
+				lastI = i + 1;
+				continue;
+			}
+
 			if (c !== 40 && c !== 41 && c !== 124) {
+				state = state_LITERAL;
 				// ()|
 				continue;
 			}
@@ -35,11 +67,13 @@ var parser_parseGroups;
 				var group = new Node.Group();
 				current.appendChild(group);
 				current = group;
+				state = state_GROUP_START;
 				continue;
 			}
 			if (c === 41) {
 				// ) Group ending
 				current = current.parentNode;
+				state = state_GROUP_END;
 				continue;
 			}
 			if (c === 124) {

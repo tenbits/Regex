@@ -28,6 +28,8 @@
 	// import ../src/Nodes/exports.es6
 	// import ../src/utils/exec.es6
 	// import ../src/Handlers/exports.es6
+
+	// import ../src/Match.es6
 	// import ../src/Regex.es6
 
 	return Regex;
