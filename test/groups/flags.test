@@ -8,13 +8,19 @@ UTest({
 			var rgx = new Regex(str);
 
 			[
-				'AbCd',
-				'abCd',
-				'abcd'
+				'dAbCd',
+				'dabCd',
+				'dabcd'
 			]
 			.forEach(x => {
+				rgx.lastIndex = 0;
+
 				var match = rgx.exec(x);
-				deepEq_(Array.from(match), [x.slice(0, -1)]);
+				deepEq_(match, {
+					value: x.substring(1).slice(0, -1),
+					index: 1,
+					groups: []
+				});
 			});
 
 			[

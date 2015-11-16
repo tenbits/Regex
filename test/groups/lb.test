@@ -4,31 +4,52 @@ UTest({
 		var rgx = new Regex('(?<=a)([pr])');
 		var match = rgx.exec('cbagpdapr');
 
-		deepEq_(Array.from(match), ['p', 'p']);
-		eq_(match.index, 7);
+		deepEq_(match, {
+			value: 'p',
+			index: 7,
+			groups: [
+				{
+					value: 'p',
+					index: 7
+				}
+			]
+		});
 	},
 	'should match negative lookbehind' () {
 
 		var rgx = new Regex('(?<!a)([pr])');
 		var match = rgx.exec('cbapdagpr');
-
-		deepEq_(Array.from(match), ['p', 'p']);
-		eq_(match.index, 7);
+		deepEq_(match, {
+			value: 'p',
+			index: 7,
+			groups: [
+				{
+					value: 'p',
+					index: 7
+				}
+			]
+		});
 	},
-	'!should match' () {
+	'should match' () {
 		[
 			{
 				regex: '(?<=a|^)b',
 				test: [
 					{
 						input: 'bd',
-						match: ['b'],
-						index: 0
+						match: {
+							value: 'b',
+							index: 0,
+							groups: []
+						}
 					},
 					{
 						input: 'cbbab',
-						match: ['b'],
-						index: 4
+						match: {
+							value: 'b',
+							index: 4,
+							groups: []
+						}
 					}
 				]
 			},
@@ -37,18 +58,27 @@ UTest({
 				test: [
 					{
 						input: 'bd',
-						match: ['b'],
-						index: 0
+						match: {
+							value: 'b',
+							index: 0,
+							groups: []
+						}
 					},
 					{
 						input: 'kbbab',
-						match: ['b'],
-						index: 4
+						match: {
+							value: 'b',
+							index: 4,
+							groups: []
+						}
 					},
 					{
 						input: 'cbbab',
-						match: ['c'],
-						index: 0
+						match: {
+							value: 'c',
+							index: 0,
+							groups: []
+						}
 					}
 				]
 			}
@@ -60,8 +90,8 @@ UTest({
 				eq_(x.match, null);
 				return;
 			}
-			deepEq_(Array.from(match), x.match);
-			eq_(match.index, x.index);
+
+			deepEq_(match, x.match);
 		}));
 	}
 

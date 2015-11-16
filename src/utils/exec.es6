@@ -10,9 +10,10 @@ var exec_root,
 			return null;
 		}
 		if (root.groups) {
-			match.groups = {};
 			for (var key in root.groups) {
-				match.groups[key] = match[root.groups[key]];
+				var num = root.groups[key];
+				var group = match.groups[num - 1];
+				match.groups[key] = group && group.value;
 			}
 		}
 		return match;

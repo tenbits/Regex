@@ -31,7 +31,16 @@ UTest({
 		.forEach(str => {
 			var rgx = new Regex(str);
 			var match = rgx.exec('some ahelloa baz');
-			deepEq_(Array.from(match), ['ahelloa', 'a']);
+			has_(match, {
+				value: 'ahelloa',
+				index: 5,
+				groups: [
+						{
+							value: 'a',
+							index: 5
+						}
+				]
+			});
 			eq_(match.groups.me, 'a');
 		});
 	}
