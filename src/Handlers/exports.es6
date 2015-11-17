@@ -21,6 +21,7 @@ var Handlers;
 	// import NamedBackreference.es6
 	// import Possessive.es6
 	// import Literals/Subexpressions.es6
+	// import Literals/Unicode.es6
 
 	var handler_GROUP = 0,
 		handler_LITERAL = 1,
@@ -33,7 +34,8 @@ var Handlers;
 		[handler_GROUP, AtomicGroup],
 		[handler_GROUP, LookbehindGroup],
 		[handler_NODE, PossessiveGroup],
-		[handler_NODE, PossessiveLiteral]
+		[handler_NODE, PossessiveLiteral],
+		[handler_LITERAL, UnicodeCodePoint]
 	];
 
 	var BeforeIndexed = [
