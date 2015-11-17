@@ -2,7 +2,8 @@ var dom_appendChild,
 	dom_prependChild,
 	dom_insertBefore,
 	dom_insertAfter,
-	dom_removeChild;
+	dom_removeChild,
+	dom_clone;
 
 (function(){
 	dom_appendChild = function(parent, child){
@@ -89,5 +90,23 @@ var dom_appendChild,
 		el.parentNode = null;
 		el.nextSibling = null;
 		el.previousSibling = null;
+	};
+
+	dom_clone = function(node) {
+		var Ctor = node.constructor,
+			clone = new Ctor();
+
+		obj_extend(clone, node);
+		clone.parentNode = null;
+		clone.nextSibling = null;
+		clone.previousSibling = null;
+		clone.firstChild = null;
+		clone.lastChild = null;
+
+		for(var el = node.firstChild; el != null; el = el.nextSibling) {
+			var child = dom_clone(el);
+			clone.appendChild(child);
+		}
+		return clone;
 	};
 }());

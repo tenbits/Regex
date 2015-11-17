@@ -26,7 +26,7 @@ var parser_parseGroups;
 
 			if (state === state_GROUP_END && (c === 63 || c === 42 || c === 43 || c === 123)) {
 				//?*+{
-				var repetition, greedy = true;
+				var repetition, lazy = false, possessive = false;
 				if (i === 123) {
 					var end = str.indexOf('}', i);
 					repetition = str.substring(i, end + 1);
@@ -36,14 +36,19 @@ var parser_parseGroups;
 					if (i < imax - 1) {
 						c = str.charCodeAt(i + 1);
 						if (c === 63) {
-							greedy = false;
+							lazy = true;
+							i++;
+						}
+						if (c === 43) {
+							possessive = true;
 							i++;
 						}
 					}
 				}
 				var group = current.lastChild;
 				group.repetition = repetition;
-				group.greedy = greedy;
+				group.lazy = lazy;
+				group.possessive = possessive;
 				state = state_LITERAL;
 
 				lastI = i + 1;

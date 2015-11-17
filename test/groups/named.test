@@ -6,7 +6,7 @@ UTest({
 		]
 		.forEach(str => {
 			var rgx = new Regex(str);
-			var match = rgx.exec('New 2015  Baz');
+			var match = rgx.match('New 2015  Baz');
 			eq_(match.groups.number, '2015');
 			eq_(match.groups.foo, 'Baz');
 		});
@@ -18,7 +18,7 @@ UTest({
 		]
 		.forEach(str => {
 			var rgx = new Regex(str);
-			var match = rgx.exec('some aBtram42C');
+			var match = rgx.match('some aBtram42C');
 			eq_(match.groups.num, '42');
 		});
 	},
@@ -30,9 +30,29 @@ UTest({
 		]
 		.forEach(str => {
 			var rgx = new Regex(str);
-			var match = rgx.exec('some ahelloa baz');
+			var match = rgx.match('some ahelloa baz');
 			has_(match, {
 				value: 'ahelloa',
+				index: 5,
+				groups: [
+						{
+							value: 'a',
+							index: 5
+						}
+				]
+			});
+			eq_(match.groups.me, 'a');
+		});
+	},
+	'should include sub-expression' () {
+		[
+			"(?<me>a|b)hello\\g<me>"
+		]
+		.forEach(str => {
+			var rgx = new Regex(str);
+			var match = rgx.match('some ahellob baz');
+			has_(match, {
+				value: 'ahellob',
 				index: 5,
 				groups: [
 						{

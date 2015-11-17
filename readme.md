@@ -11,13 +11,9 @@ Better JavaScript Regular Expression Library
 
 - Named Groups `(?<name>expression)`, `(?'name'expression)`
 
-    ```javascript
-    var rgx = new Regex('Name:\\s*(?<name>\\w+)');
-    var match = rgx.exec('My Name: Baz');
-    equals(match.groups.name, 'Baz');
-    ```
-
 - Named Backreferences `\k<name>`, `\k'name'`
+
+- Named subexpressions `\g<name>`
 
 - Comment Groups `(?# my comment)`
 
@@ -25,6 +21,17 @@ Better JavaScript Regular Expression Library
 
 - Positive-/Negative Lookbehind `(?<=expression)` `(?<!expression)`
 
+- Possessive Quantifiers `++` `*+`
+
 - Options
     + `x` : `(?x) \\d #comment`
     + `i` : `a(?i)b(?-i)c`
+
+
+### Named Groups
+
+```javascript
+var rgx = new Regex('Name:\\s*(?<name>\\w+)');
+var match = rgx.exec('My Name: Baz');
+equals(match.groups.name, 'Baz');
+```

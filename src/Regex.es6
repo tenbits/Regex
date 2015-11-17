@@ -4,10 +4,27 @@ class Regex {
 		this.lastIndex = 0;
 	}
 
-	exec(input) {
+	exec (input, start) {
+		if (start != null) {
+			this.lastIndex = start;
+		}
 		var match = this.root.exec(input, this.lastIndex);
 		this.lastIndex = match == null ? 0 : match.index;
 		return match;
+	}
+
+	match (input, start) {
+		if (start != null) {
+			this.lastIndex = start;
+		}
+		var match = this.root.match(input, this.lastIndex);
+		this.lastIndex = match == null ? 0 : match.index;
+		return match;
+	}
+
+	matches (input) {
+		this.lastIndex = 0;
+		return this.root.matches(input, 0);
 	}
 
 	static parseGroups (str) {
@@ -18,9 +35,11 @@ class Regex {
 		var root = parser_parseGroups(str);
 
 		ast_defineFlags(root, flags);
-		ast_defineHandlers(root);
-		ast_indexGroups(root);
 
+		Handlers.define(root);
+		Handlers.beforeIndexed(root);
+
+		ast_indexGroups(root);
 		Handlers.afterIndexed(root);
 
 		ast_combineNatives(root);

@@ -1,22 +1,39 @@
 var exec_root,
 	exec_children,
-	exec_clearCursors;
+	exec_clearCursors,
+	exec_Opts;
 (function(){
 
-	exec_root = function (root, str, i) {
+	exec_root = function (root, str, i, opts) {
 		backtrack_clearCursors(root)
-		var match = exec_children(root, str, i);
+		var match = exec_children(root, str, i, opts);
 		if (match == null) {
 			return null;
+		}
+		var response = match;
+		if (opts && opts.indexed === false) {
+			var groups = match.groups,
+				imax = groups.length + 1,
+				i = 0,
+				arr = new Array(imax),
+				x;
+			while( ++i < imax) {
+				x = groups[i - 1];
+				arr[i] = x && x.value;
+			}
+			arr[0] = match.value;
+			arr.index = match.index;
+			arr.groups = {};
+			response = arr;
 		}
 		if (root.groups) {
 			for (var key in root.groups) {
 				var num = root.groups[key];
 				var group = match.groups[num - 1];
-				match.groups[key] = group && group.value;
+				response.groups[key] = group && group.value;
 			}
 		}
-		return match;
+		return response;
 	};
 
 	exec_children = function(node, str, i, opts_, cursor) {
@@ -64,12 +81,14 @@ var exec_root,
 		this.opts = new Opts(opts);
 	};
 
-	var Opts = function(current){
+	var Opts = exec_Opts = function(current){
 		this.fixed = false;
+		this.indexed = false;
 		if (current == null) {
 			return;
 		}
 		this.fixed = current.fixed;
+		this.indexed = current.indexed;
 	};
 
 	var Matchers = {
@@ -162,24 +181,62 @@ var exec_root,
 
 		while(++i < imax) {
 			var match = matches[i],
-				j = 0,
-				jmax = match.groups.length;
+				groups = match.groups,
+				jmax = groups.length,
+				j = 0;
 
 			out.value += match.value;
 
 			if (match.groupIndex != null) {
-				var groups = match.groups;
-				var pos = match.groupIndex - 1;
-				var length = pos + groups.length - 1;
+				var pos = match.groupIndex - 1,
+					length = pos + groups.length - 1;
 				while (out.groups.length < length) {
 					out.groups[out.groups.length++] = null;
 				}
 				out.groups.splice(pos, 0, ...groups);
 				continue;
 			}
-			out.groups = out.groups.concat(match.groups);
+			out.groups = out.groups.concat(groups);
 		}
+		return out;
+	}
 
+	function matches_joinArray(matches) {
+		var str = '';
+		var out = [ str ];
+
+		out.index = matches[0].index;
+
+		var i = -1,
+			imax = matches.length;
+
+		while(++i < imax) {
+			var match = matches[i],
+				j = 0,
+				jmax = match.groups.length;
+
+			str += match.value;
+
+			var groups = match.groups,
+				jmax = groups.length,
+				j = -1,
+				arr = new Array(jmax);
+			while(++j < jmax) {
+				arr[j] = groups[j].value;
+			}
+
+			if (match.groupIndex != null) {
+				var pos = match.groupIndex,
+					length = pos + jmax - 1;
+				while (out.groups.length < length) {
+					out[out.length++] = null;
+				}
+				out.splice(pos, 0, ...arr);
+				continue;
+			}
+			out = out.concat(arr);
+		}
+		out.index = matches[0].index;
 		return out;
 	}
 }());

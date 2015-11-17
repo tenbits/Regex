@@ -1,4 +1,4 @@
-var JsNoneCapturedGroup = {
+var NoneCapturedGroup = {
 
 	transform (node) {
 		node.isCaptured = false;

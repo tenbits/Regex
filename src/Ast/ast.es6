@@ -3,7 +3,6 @@ var ast_combineNatives,
 	ast_indexGroups,
 	ast_indexShadowedGroups,
 	ast_createBlocks,
-	ast_defineHandlers,
 	ast_resolveBacktracks;
 
 (function() {
@@ -88,25 +87,6 @@ var ast_combineNatives,
 		});
 	};
 
-	ast_defineHandlers = function(root) {
-		visitor_walk(root, function(node) {
-			var Handler = Handlers.get(node);
-			if (Handler == null) {
-				return;
-			}
-			if (Handler.transform) {
-				return Handler.transform(node, root);
-			}
-			if (Handler.create) {
-				var el = Handler.create(node, root);
-				return transformer_replaceNode(node, el, false);
-			}
-			if (Handler.process) {
-				return Handler.process(node, root);
-			}
-		});
-	};
-
 	function resolveNatives(root) {
 
 		visitor_walkUp(root, visit);
@@ -125,25 +105,6 @@ var ast_combineNatives,
 				el = el.nextSibling;
 			}
 		}
-	}
-
-	function combineNativesOld(root) {
-		if (root.isNative) {
-			var literal = new Node.Literal(root.toString());
-			root.empty();
-			root.appendChild(literal);
-			return;
-		}
-		visitor_walk(root, function(node){
-			if (node.isNative === false) {
-				return;
-			}
-			if (combine_flagsAreEqual(node) === false) {
-				return;
-			}
-			var literal = new Node.Literal(node.toString());
-			return transformer_replaceNode(node, literal, false);
-		});
 	}
 
 	function combineNatives(root) {
@@ -166,28 +127,18 @@ var ast_combineNatives,
 				}
 			}
 		}
-
 		for (var el = node.firstChild; el != null; el = el.nextSibling) {
 			if (el.type === Node.OR) {
 				continue;
 			}
-			//debugger;
-			//if (el.firstChild && el.firstChild.textContent && el.firstChild.textContent.indexOf('b') > -1) {
-			//	debugger;
-			//}
-			//if (el.textContent && el.textContent.indexOf('b') > -1) {
-			//	debugger;
-			//}
 			combineNodes(el);
 			if (hasBlocks === true) {
 				continue;
 			}
-
 			if (el.isNative === false) {
 				start = null;
 				continue;
 			}
-
 			if (el.firstChild !== el.lastChild) {
 				start = null;
 				continue;
@@ -248,10 +199,12 @@ var ast_combineNatives,
 		}
 		return true;
 	};
-	function compileNatives(root) {
-
-		visitor_walk(root, function(node) {
+	function compileNatives(node) {
+		visitor_walk(node, function(node) {
 			if (node.type !== Node.LITERAL) {
+				if (typeof node.compile === 'function') {
+					node.compile();
+				}
 				return;
 			}
 			var rgx = new Node.RegexNode(node.textContent, node);

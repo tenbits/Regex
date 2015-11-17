@@ -6,7 +6,8 @@ var Group = class_create(AstNode, {
 	name: null,
 
 	repetition: '',
-	greedy: null,
+	lazy: false,
+	possessive: false,
 
 	pos: null,
 	value: null,
@@ -23,8 +24,11 @@ var Group = class_create(AstNode, {
 		if (this.repetition != null) {
 			str += this.repetition;
 		}
-		if (this.greedy === false) {
+		if (this.lazy === true) {
 			str += '?';
+		}
+		if (this.possessive === true) {
+			str += '+';
 		}
 		return str;
 	}

@@ -40,7 +40,7 @@ var RegexNode;
 			}
 
 
-			return this.resolveMatches(match, matchIndex);
+			return this.resolveMatches(match, matchIndex, opts);
 		},
 
 		resolveMatches (nativeMatch, matchIndex) {
@@ -98,7 +98,7 @@ var RegexNode;
 
 		compileIndexer (flags) {
 			var root = parser_parseGroups(this.textContent);
-			ast_defineHandlers(root);
+			Handlers.define(root);
 
 			visitor_walkUp(root, node => {
 				if (node.type === Node.OR) {

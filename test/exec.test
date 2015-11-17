@@ -201,10 +201,19 @@ UTest({
 
 function Assert(data) {
 	var rgx = new Regex(data.regex);
-	var match = rgx.exec(data.input);
+	var match = rgx.match(data.input);
 	if (match == null && data.match != null) {
 		throw Error('Pattern shoud be matched: ' + data.regex);
 	}
 
 	deepEq_(match, data.match);
+
+	var arr = rgx.exec(data.input, 0);
+	eq_(arr.index, data.match.index);
+
+
+	var groups = data.match.groups.map(x => x && x.value);
+	groups = [ data.match.value, ...groups ];
+
+	deepEq_(Array.from(arr), groups);
 }
