@@ -46,22 +46,52 @@ UTest({
 	},
 	'should include sub-expression' () {
 		[
-			"(?<me>a|b)hello\\g<me>"
-		]
-		.forEach(str => {
-			var rgx = new Regex(str);
-			var match = rgx.match('some ahellob baz');
-			has_(match, {
-				value: 'ahellob',
-				index: 5,
-				groups: [
+			{
+				regex: "(?<me>a|b)hello\\g<me>",
+				input: 'some ahellob baz',
+				match: {
+					value: 'ahellob',
+					index: 5,
+					groups: [
+							{
+								value: 'a',
+								index: 5
+							}
+					]
+				},
+				groups: {
+					me: 'a'
+				}
+			},
+			{
+				regex: "Handy ((?<some>[a-z]|1)+) hello(?<baz>\\s+\\g<some>) \\g<some>",
+				input: 'wow Handy tt hello  z 1',
+				match: {
+					value: 'Handy tt hello  z 1',
+					index: 4,
+					groups: [
 						{
-							value: 'a',
-							index: 5
+							value: 't',
+							index: 10
+						},
+						{
+							value: '  z',
+							index: 18
 						}
-				]
-			});
-			eq_(match.groups.me, 'a');
+					]
+				},
+				groups: {
+					some: 't',
+					baz: '  z'
+				}
+			}
+		]
+		.forEach(data => {
+			var rgx = new Regex(data.regex);
+			var match = rgx.match(data.input);
+			has_(match, data.match);
+			for (var key in data.groups)
+				eq_(match.groups[key], data.groups[key]);
 		});
 	}
 });
