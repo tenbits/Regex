@@ -15,7 +15,7 @@ UTest({
 			.forEach(x => {
 				rgx.lastIndex = 0;
 
-				var match = rgx.exec(x);
+				var match = rgx.match(x);
 				deepEq_(match, {
 					value: x.substring(1).slice(0, -1),
 					index: 1,
@@ -30,7 +30,7 @@ UTest({
 				'ABcd'
 			]
 			.forEach(x => {
-				var match = rgx.exec(x);
+				var match = rgx.match(x);
 				eq_(match, null);
 			});
 		})

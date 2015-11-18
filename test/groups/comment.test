@@ -10,7 +10,7 @@ UTest({
 		]
 		.forEach(str => {
 			var rgx = new Regex(str);
-			var match = rgx.exec('BazFoo');
+			var match = rgx.match('BazFoo');
 			deepEq_(match, {
 				value: 'Fo',
 				index: 3,

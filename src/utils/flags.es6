@@ -6,9 +6,12 @@ var flags_serialize,
 	flags_extend;
 (function(){
 	flags_serialize = function(flags) {
-		var str = 'g';
+		var str = '';
 		if (flags == null) {
-			return str;
+			return flags_serialize(flags_DEFAULT);
+		}
+		if (flags.g) {
+			str += 'g';
 		}
 		if (flags.i) {
 			str += 'i';
@@ -17,6 +20,12 @@ var flags_serialize,
 			str += 'm';
 		}
 		return str;
+	};
+
+	var flags_DEFAULT = {
+		g: true,
+		m: true,
+		i: false
 	};
 
 	flags_parse = function(str){

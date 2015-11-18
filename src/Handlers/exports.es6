@@ -24,6 +24,9 @@ var Handlers;
 	// import Literals/UnicodeCodePoint.es6
 	// import Literals/UnicodeCategory.es6
 
+	// import Anchors/Input_Start-End.es6
+
+
 	var handler_GROUP = 0,
 		handler_LITERAL = 1,
 		handler_NODE = 2;
@@ -37,7 +40,10 @@ var Handlers;
 		[handler_NODE, PossessiveGroup],
 		[handler_NODE, PossessiveLiteral],
 		[handler_LITERAL, UnicodeCodePoint],
-		[handler_LITERAL, UnicodeCategory]
+		[handler_LITERAL, UnicodeCategory],
+		[handler_LITERAL, InputStart],
+		[handler_LITERAL, InputEnd],
+		[handler_LITERAL, InputEndWithNewLine],
 	];
 
 	var BeforeIndexed = [

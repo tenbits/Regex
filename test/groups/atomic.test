@@ -15,6 +15,7 @@ UTest({
 				]
 			}
 		});
+		return;
 
 		Assert({
 			regex: 'a(?>bc|b)c',
@@ -59,7 +60,7 @@ UTest({
 
 function Assert(data) {
 	var rgx = new Regex(data.regex);
-	var match = rgx.exec(data.input);
+	var match = rgx.match(data.input);
 	if (data.match == null) {
 		eq_(null, match, 'Pattern shoud be matched: ' + data.regex);
 		return;

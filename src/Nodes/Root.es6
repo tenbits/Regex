@@ -2,6 +2,14 @@ var Root = class_create(Block, {
 
 	type: type_Root,
 
+	constructor () {
+		this.flags = {
+			i: false,
+			m: true,
+			g: true,
+		};
+	},
+
 	exec (str, i) {
 		var opts = new exec_Opts;
 		opts.indexed = false;
@@ -16,4 +24,13 @@ var Root = class_create(Block, {
 
 	groups: null,
 	expressions: null,
+	transformers: null,
+	filters: null,
+
+	addTransformer (fn) {
+		if (this.transformers == null)
+			this.transformers = [];
+
+		this.transformers.push(fn);
+	}
 });

@@ -2,7 +2,7 @@ UTest({
 	'should match positive lookbehind' () {
 
 		var rgx = new Regex('(?<=a)([pr])');
-		var match = rgx.exec('cbagpdapr');
+		var match = rgx.match('cbagpdapr');
 
 		deepEq_(match, {
 			value: 'p',
@@ -18,7 +18,7 @@ UTest({
 	'should match negative lookbehind' () {
 
 		var rgx = new Regex('(?<!a)([pr])');
-		var match = rgx.exec('cbapdagpr');
+		var match = rgx.match('cbapdagpr');
 		deepEq_(match, {
 			value: 'p',
 			index: 7,
@@ -85,7 +85,7 @@ UTest({
 		]
 		.forEach(data => data.test.forEach(x => {
 			var rgx = new Regex(data.regex);
-			var match = rgx.exec(x.input);
+			var match = rgx.match(x.input);
 			if (match == null) {
 				eq_(x.match, null);
 				return;

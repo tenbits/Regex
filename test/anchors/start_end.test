@@ -1,0 +1,25 @@
+UTest({
+	'should match input start letter' () {
+		var rgx = new Regex('\\Af');
+		var match = rgx.match('f');
+		eq_(match.value, 'f')
+		eq_(match.index, 0);
+	},
+	'should not match new line' () {
+		var rgx = new Regex('\\Af');
+		var match = rgx.match('\nf');
+		eq_(match, null)
+	},
+	'should match end' () {
+		var rgx = new Regex('f\\z');
+		var match = rgx.match('af');
+		eq_(match.value, 'f')
+		eq_(match.index, 1);
+	},
+	'!should match end without newline' () {
+		var rgx = new Regex('f\\Z');
+		var match = rgx.match('af\n');
+		eq_(match.value, 'f')
+		eq_(match.index, 1);
+	}
+});

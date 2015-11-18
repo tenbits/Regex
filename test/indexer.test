@@ -1,7 +1,7 @@
 UTest({
 	'group position' () {
 		var rgx = new Regex('a(\\w+)');
-		var match = rgx.exec('bgad');
+		var match = rgx.match('bgad');
 		eq_(match.value, 'ad');
 		eq_(match.index, 2);
 		eq_(match.groups[0].value, 'd');
@@ -9,7 +9,7 @@ UTest({
 	},
 	'repeated group position' () {
 		var rgx = new Regex('(ba)+.(a*)');
-		var match = rgx.exec('babaaaaa');
+		var match = rgx.match('babaaaaa');
 		eq_(match.value, 'babaaaaa');
 		eq_(match.groups[0].value, 'ba');
 		eq_(match.groups[0].index, 0);
@@ -19,7 +19,7 @@ UTest({
 	},
 	'not captured group at the end' () {
 		var rgx = new Regex('\\w+(a)(?:a)');
-		var match = rgx.exec('abcaa');
+		var match = rgx.match('abcaa');
 
 		eq_(match.value, 'abcaa');
 		eq_(match.index, 0);
@@ -29,7 +29,7 @@ UTest({
 	},
 	'not captured group int the middle' () {
 		var rgx = new Regex('\\w+(?:a)(a)');
-		var match = rgx.exec('abcaa');
+		var match = rgx.match('abcaa');
 
 		eq_(match.value, 'abcaa');
 		eq_(match.index, 0);

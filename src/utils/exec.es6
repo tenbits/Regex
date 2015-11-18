@@ -10,6 +10,18 @@ var exec_root,
 		if (match == null) {
 			return null;
 		}
+		if (root.filters != null) {
+			// @TODO
+		}
+		if (root.transformers != null) {
+			var fns = root.transformers,
+				imax = fns.length,
+				i = -1;
+			while( ++i < imax ) {
+				fns[i](root, match);
+			}
+		}
+
 		var response = match;
 		if (opts && opts.indexed === false) {
 			var groups = match.groups,
