@@ -1,0 +1,13 @@
+UTest({
+	'should match utf letter' () {
+		var rgx = new Regex('\\p{L}+');
+		var match = rgx.match('-àq0');
+		eq_(match.value, 'àq')
+		eq_(match.index, 1);
+
+		var rgx = new Regex('[\\d\\p{L}]+');
+		var match = rgx.match('-àq0!');
+		eq_(match.value, 'àq0')
+		eq_(match.index, 1);
+	}
+});

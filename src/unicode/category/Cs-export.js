@@ -1,0 +1,1 @@
+Category.Cs = "[\uDC00-\uDFFF]|[\uD800-\uDBFF]"

@@ -18,10 +18,11 @@ var Handlers;
 	// import Groups/NamedGroup.es6
 	// import Groups/LookbehindGroup.es6
 
-	// import NamedBackreference.es6
 	// import Possessive.es6
+	// import Literals/NamedBackreference.es6
 	// import Literals/Subexpressions.es6
-	// import Literals/Unicode.es6
+	// import Literals/UnicodeCodePoint.es6
+	// import Literals/UnicodeCategory.es6
 
 	var handler_GROUP = 0,
 		handler_LITERAL = 1,
@@ -35,7 +36,8 @@ var Handlers;
 		[handler_GROUP, LookbehindGroup],
 		[handler_NODE, PossessiveGroup],
 		[handler_NODE, PossessiveLiteral],
-		[handler_LITERAL, UnicodeCodePoint]
+		[handler_LITERAL, UnicodeCodePoint],
+		[handler_LITERAL, UnicodeCategory]
 	];
 
 	var BeforeIndexed = [

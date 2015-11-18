@@ -1,6 +1,7 @@
 var str_isEscaped,
 	str_indexOfNewLine,
-	str_remove;
+	str_remove,
+	str_replaceByIndex;
 (function(){
 
 	str_isEscaped = function(str, i) {
@@ -34,4 +35,7 @@ var str_isEscaped,
 		return str.substring(0, start) + str.substring(end);
 	};
 
+	str_replaceByIndex = function(str, start, end, value) {
+		return str.substring(0, start) + value + str.substring(end);
+	};
 }());
