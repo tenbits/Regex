@@ -5,10 +5,15 @@ UTest({
 		eq_(match.value, 'f')
 		eq_(match.index, 0);
 	},
-	'should not match new line' () {
+	'should not match new line with \\A, but ^ should match' () {
 		var rgx = new Regex('\\Af');
 		var match = rgx.match('\nf');
-		eq_(match, null)
+		eq_(match, null);
+
+		var rgx = new Regex('^f');
+		var match = rgx.match('\nf');
+		eq_(match.value, 'f');
+		eq_(match.index, 1);
 	},
 	'should match end' () {
 		var rgx = new Regex('f\\z');
@@ -16,7 +21,7 @@ UTest({
 		eq_(match.value, 'f')
 		eq_(match.index, 1);
 	},
-	'!should match end without newline' () {
+	'should match end without newline' () {
 		var rgx = new Regex('f\\Z');
 		var match = rgx.match('af\n');
 		eq_(match.value, 'f')

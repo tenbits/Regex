@@ -1,0 +1,28 @@
+UTest({
+	'should match sticky' () {
+		var rgx = new Regex('\\Gf\\d+');
+		var str = 'f1f12f123-f123';
+		var match = rgx.match(str);
+		eq_(match.value, 'f1')
+		eq_(match.index, 0);
+		eq_(rgx.lastIndex, 2);
+
+		match = rgx.match(str);
+		eq_(match.value, 'f12')
+		eq_(match.index, 2);
+		eq_(rgx.lastIndex, 5);
+
+		match = rgx.match(str);
+		eq_(match.value, 'f123')
+		eq_(match.index, 5);
+		eq_(rgx.lastIndex, 9);
+
+		match = rgx.match(str);
+		eq_(match, null);
+
+		rgx.lastIndex = 2;
+		match = rgx.match(str);
+		eq_(match.value, 'f12')
+		eq_(match.index, 2);
+	},
+});

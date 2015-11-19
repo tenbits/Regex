@@ -25,6 +25,7 @@ var Handlers;
 	// import Literals/UnicodeCategory.es6
 
 	// import Anchors/Input_Start-End.es6
+	// import Anchors/InputLastMatch.es6
 
 
 	var handler_GROUP = 0,
@@ -44,6 +45,7 @@ var Handlers;
 		[handler_LITERAL, InputStart],
 		[handler_LITERAL, InputEnd],
 		[handler_LITERAL, InputEndWithNewLine],
+		[handler_LITERAL, InputLastMatch],
 	];
 
 	var BeforeIndexed = [

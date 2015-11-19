@@ -10,9 +10,5 @@ var Block = class_create(AstNode, {
 			el = el.nextSibling;
 		}
 		return str;
-	},
-
-	foo () {
-		return 'baz'
 	}
 });

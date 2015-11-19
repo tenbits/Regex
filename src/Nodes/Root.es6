@@ -5,6 +5,7 @@ var Root = class_create(Block, {
 	constructor () {
 		this.flags = {
 			i: false,
+			y: false,
 			m: true,
 			g: true,
 		};

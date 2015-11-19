@@ -18,7 +18,7 @@ class Regex {
 			this.lastIndex = start;
 		}
 		var match = this.root.match(input, this.lastIndex);
-		this.lastIndex = match == null ? 0 : match.index;
+		this.lastIndex = match == null ? 0 : match.index + match.value.length;
 		return match;
 	}
 

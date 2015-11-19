@@ -2,7 +2,10 @@ var ast_defineFlags;
 (function(){
 	ast_defineFlags = function(root, str){
 
-		root.flags = str == null ? null : flags_parse(str);
+		if (str != null) {
+			root.flags = flags_extend(root.flags, flags_parse(str));
+		}
+
 		visitor_walk(root, (node) => {
 			if (node.type !== Node.LITERAL) {
 				return;

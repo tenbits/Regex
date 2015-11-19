@@ -10,8 +10,19 @@ var exec_root,
 		if (match == null) {
 			return null;
 		}
+		if (root.flags.y && match.index !== i) {
+			return null;
+		}
 		if (root.filters != null) {
-			// @TODO
+			var fns = root.filters,
+				imax = fns.length,
+				i = -1;
+			while( ++i < imax ) {
+				match = fns[i](root, match);
+				if (match == null) {
+					return null;
+				}
+			}
 		}
 		if (root.transformers != null) {
 			var fns = root.transformers,
