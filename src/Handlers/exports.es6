@@ -26,7 +26,7 @@ var Handlers;
 
 	// import Anchors/Input_Start-End.es6
 	// import Anchors/InputLastMatch.es6
-
+	// import Static/GAnchor.es6
 
 	var handler_GROUP = 0,
 		handler_LITERAL = 1,
@@ -37,6 +37,7 @@ var Handlers;
 		[handler_GROUP, NoneCapturedGroup],
 		[handler_GROUP, NamedGroup],
 		[handler_GROUP, AtomicGroup],
+		[handler_GROUP, GAnchorStatic],
 		[handler_GROUP, LookbehindGroup],
 		[handler_NODE, PossessiveGroup],
 		[handler_NODE, PossessiveLiteral],
