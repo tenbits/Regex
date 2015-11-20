@@ -4,8 +4,7 @@
 [![NPM version](https://badge.fury.io/js/Regex.svg)](http://badge.fury.io/js/atma-regex)
 [![Bower version](https://badge.fury.io/bo/Regex.svg)](http://badge.fury.io/bo/atma-regex)
 
-
-Better JavaScript Regular Expression Library
+JavaScript Regular Expression Library for NodeJS and Browsers.
 
 ### Features
 
@@ -21,11 +20,18 @@ Better JavaScript Regular Expression Library
 
 - Positive-/Negative Lookbehind `(?<=expression)` `(?<!expression)`
 
+- Anchors `\A`, `\Z`, `\z`, `\G`
+
 - Possessive Quantifiers `++` `*+`
 
 - Options
     + `x` : `(?x) \\d #comment`
     + `i` : `a(?i)b(?-i)c`
+
+- Unicode
+
+	+ `\x{HEX}` : `\x{200D}`
+	+ `\p{CATEGORY}` : `\p{L}`
 
 
 ### Named Groups
