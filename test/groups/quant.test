@@ -2,13 +2,13 @@ UTest({
 	'should check the quantifiers' () {
 		var input = 'xfooxxxxxxfoo';
 
-		var rgx = new Regex('(.)*foo');
-		var match = rgx.match(input);
-		eq_(match.value, 'xfooxxxxxxfoo');
-
-		var rgx = new Regex('(.)*?foo');
-		var match = rgx.match(input);
-		eq_(match.value, 'xfoo');
+		//var rgx = new Regex('(.)*foo');
+		//var match = rgx.match(input);
+		//eq_(match.value, 'xfooxxxxxxfoo');
+		//
+		//var rgx = new Regex('(.)*?foo');
+		//var match = rgx.match(input);
+		//eq_(match.value, 'xfoo');
 
 		var rgx = new Regex('(.)*+foo');
 		var match = rgx.match(input);

@@ -2,8 +2,8 @@ var RegexOpts = class_create({
 	isNative: true,
 	isCaptured: true,
 	isIncluded: true,
-	isBacktracked: false,
 	isAtomic: false,
+	isBacktracked: null,
 
 	flags: null,
 	cursor: null,

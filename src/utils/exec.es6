@@ -40,7 +40,7 @@ var exec_root,
 				i = 0,
 				arr = new Array(imax),
 				x;
-			while( ++i < imax) {
+			while(++i < imax) {
 				x = groups[i - 1];
 				arr[i] = x && x.value;
 			}
@@ -59,11 +59,11 @@ var exec_root,
 		return response;
 	};
 
-	exec_children = function(node, str, i, opts_, cursor) {
+	exec_children = function(node, str, i, opts_, start, end) {
 		var matches = [], backtracking = [], opts = new Opts(opts_);
 
-		var el = cursor || node.firstChild;
-		while(el != null) {
+		var el = start || node.firstChild;
+		while(el != end) {
 			var matcher = Matchers[el.type];
 			var match = el.exec ? el.exec(str, i, opts) : matcher(el, str, i, opts);
 			if (match == null) {
@@ -189,7 +189,8 @@ var exec_root,
 	};
 
 	function backtrack_clearCursors (node) {
-		visitor_walkUp(node, x => x.cursor = null);
+		visitor_walk(node, x => x.cursor = null);
+		node.cursor = null;
 	};
 
 	function matches_join(matches) {

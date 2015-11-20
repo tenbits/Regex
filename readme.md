@@ -38,6 +38,6 @@ JavaScript Regular Expression Library for NodeJS and Browsers.
 
 ```javascript
 var rgx = new Regex('Name:\\s*(?<name>\\w+)');
-var match = rgx.exec('My Name: Baz');
+var match = rgx.mach('My Name: Baz');
 equals(match.groups.name, 'Baz');
 ```

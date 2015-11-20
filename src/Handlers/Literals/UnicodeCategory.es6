@@ -80,10 +80,10 @@ var UnicodeCategory;
 
 	var Category = {};
 
-	// import /src/unicode/category/L-export.js
-	// import /src/unicode/category/Nl-export.js
-	// import /src/unicode/category/Nd-export.js
-	// import /src/unicode/category/Mn-export.js
-	// import /src/unicode/category/Mc-export.js
-	// import /src/unicode/category/Pc-export.js
+	// import ../../unicode/category/L-export.js
+	// import ../../unicode/category/Nl-export.js
+	// import ../../unicode/category/Nd-export.js
+	// import ../../unicode/category/Mn-export.js
+	// import ../../unicode/category/Mc-export.js
+	// import ../../unicode/category/Pc-export.js
 }());

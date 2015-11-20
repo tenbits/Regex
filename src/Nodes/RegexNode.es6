@@ -19,14 +19,21 @@ var RegexNode;
 			this.rgxFixed = new RegExp('^' + this.textContent, flags);
 			this.compileIndexer(flags);
 			this.groupIndex = node.index;
+			this.isBacktracked = hasRepetition(text);
 		},
 
-		exec (str, i, opts) {
+		exec (str_, i, opts) {
+			var str = str_;
+			if (this.cursor) {
+				str = str.substring(0, this.cursor.index + this.cursor.value.length - 1);
+			}
+
 			var regex, match, matchIndex;
 			if (opts.fixed) {
 				var sub = str.substring(i);
 				match = this.rgxFixed.exec(sub);
 				if (match == null) {
+					this.cursor = null;
 					return null;
 				}
 				matchIndex = i;
@@ -34,12 +41,17 @@ var RegexNode;
 				this.rgxSearch.lastIndex = i;
 				match = this.rgxSearch.exec(str);
 				if (match == null) {
+					this.cursor = null;
 					return null;
 				}
 				matchIndex = match.index;
 			}
-
-
+			if (this.isBacktracked) {
+				this.cursor = {
+					value: match[0],
+					index: matchIndex
+				};
+			}
 			return this.resolveMatches(match, matchIndex, opts);
 		},
 
@@ -130,4 +142,24 @@ var RegexNode;
 			this.rgxIndexer = new RegExp(root.toString(), flags);
 		}
 	});
+
+	function hasRepetition(str) {
+		var imax = str.length,
+			i = -1, esc = false;
+		while(++i < imax) {
+			var c = str.charCodeAt(i);
+			if (c === 92 && esc === false) {
+				// \\
+				i++;
+				esc = true;
+			}
+			esc = false;
+			if (c === 42 || c === 63 || c === 43) {
+				// *?+
+				return true;
+			}
+		}
+		return false;
+	}
+
 }())

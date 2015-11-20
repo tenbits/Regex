@@ -87,6 +87,11 @@ var ast_defineFlags;
 				return;
 			}
 			x.textContent = format(x.textContent);
+			if (x.textContent === '') {
+				var next = x.nextSibling;
+				dom_removeChild(x);
+				return next;
+			}
 		});
 	}
 
@@ -97,10 +102,15 @@ var ast_defineFlags;
 	}
 
 	function visitByGroup(node, fn) {
-		var el = node;
-		while((el = el.nextSibling) != null) {
-			fn(el);
+		var el = node.nextSibling;
+		while(el != null) {
+			var next = fn(el);
+			if (next != null) {
+				el = next;
+				continue;
+			}
 			visitor_walk(el, fn);
+			el = el.nextSibling;
 		}
 	}
 	function visitByInline(node, fn) {
@@ -119,7 +129,7 @@ var ast_defineFlags;
 			i = -1;
 
 		while(i < imax && (i = str.indexOf('#', i)) > -1) {
-			if (str_isEscaped(str, i)) {
+			if (str_isEscaped(str, i) || isInCharClass(str, i)) {
 				i++;
 				continue;
 			}
@@ -134,4 +144,23 @@ var ast_defineFlags;
 	var rgx_Whitespace = /[\s\n\r]+/g,
 		rgx_FlagsGroup = /^\?(\-?[imx]+){1,2}$/,
 		rgx_FlagsInline = /^\?(\-?[imx]+){1,2}:/;
+
+	function isInCharClass(str, i) {
+		while(--i > -1) {
+			var c = str.charCodeAt(i);
+			if (c === 93 || c === 91) {
+				//[]
+				if (str_isEscaped(str, i)) {
+					continue;
+				}
+				if (c === 93) {
+					//]
+					return false;
+				}
+				// [
+				return true;
+			}
+		}
+		return false;
+	}
 }());

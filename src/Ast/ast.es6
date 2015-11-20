@@ -31,13 +31,17 @@ var ast_combineNatives,
 
 	ast_resolveBacktracks = function(root) {
 		visitor_walkUp(root, node => {
+			if (node.isBacktracked === false) {
+				return;
+			}
 			if (node.type === Node.BLOCKS) {
 				if (node.parentNode.isAtomic !== true) {
 					node.isBacktracked = node.getLength() > 1;
 				}
 			}
 			if (node.isBacktracked === true) {
-				node.parentNode.isBacktracked = true;
+				if (node.parentNode.isBacktracked !== false)
+					node.parentNode.isBacktracked = true;
 			}
 		});
 	};

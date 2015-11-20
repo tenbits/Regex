@@ -25,7 +25,9 @@ var PossessiveGroup,
 
 	var PossessiveGroupNode = class_create(Node.Group, {
 		isNative: false,
+		isBacktracked: false,
 		compiled: false,
+		isAtomic: true,
 		constructor (group) {
 			this.isCaptured = group.isCaptured;
 			this.repetition = group.repetition;

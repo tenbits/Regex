@@ -3,22 +3,8 @@ var LookbehindGroup;
 
 	LookbehindGroup = {
 
-		process (node) {
-			var el = node.nextSibling;
+		create (node) {
 			var lookbehind = new Lookbehind(node);
-
-			for (; el != null;) {
-				var next = el.nextSibling;
-				dom_removeChild(el);
-				lookbehind.appendChild(el);
-				el = next;
-			}
-
-
-			dom_insertBefore(node, lookbehind);
-			dom_removeChild(node);
-			dom_prependChild(lookbehind, node);
-
 			visitor_walkByType(node, Node.LITERAL, x => {
 				var txt = x.textContent;
 				x.textContent = '(' + txt.replace(rgx_LBGroup, '') + ')$';
@@ -51,32 +37,58 @@ var LookbehindGroup;
 		},
 
 		exec (str, i, opts) {
+			if (opts.fixed || this.nextSibling == null) {
+				return this.execAnchored(str, i, opts);
+			}
+			return this.execSearch(str, i, opts)
+		},
 
-			var lbEl = this.firstChild;
-			while( true ) {
+		execSearch (str, i, opts) {
+			var next = this.nextSibling,
+				imax = str.length;
+			while( i < imax ) {
 				var match = exec_children(
 					this,
 					str,
 					i,
 					opts,
-					lbEl.nextSibling
+					next,
+					next.nextSibling
 				);
-
 				if (match == null) {
 					return null;
 				}
 
 				i = match.index;
 				var beforeString = str.substring(0, i);
-				var beforeMatch = exec_children(lbEl, beforeString, 0, opts);
+				var beforeMatch = exec_children(this, beforeString, 0, opts);
 				if ((beforeMatch == null && this.isPositive === true) ||
 					(beforeMatch != null && this.isPositive === false)) {
 					i++;
 					continue;
 				}
-
-				return match;
+				return {
+					index: i,
+					value: '',
+					groups: []
+				};
 			}
+		},
+
+		execAnchored (str, i, opts) {
+			var beforeString = str.substring(0, i),
+				beforeMatch = exec_children(this, beforeString, 0);
+			if (this.isPositive === true && beforeMatch == null) {
+				return null;
+			}
+			else if (this.isPositive === false && beforeMatch != null) {
+				return null;
+			}
+			return {
+				value: '',
+				index: i,
+				groups: []
+			};
 		}
 	});
 
