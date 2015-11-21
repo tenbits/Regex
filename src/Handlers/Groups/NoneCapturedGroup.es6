@@ -9,7 +9,12 @@ var NoneCapturedGroup;
 				txt = literal.textContent;
 
 			literal.textContent = txt.substring(2);
-			return new NoneCapturedGroupNode();
+			var group = new NoneCapturedGroupNode();
+			group.repetition = node.repetition;
+			group.lazy = node.lazy;
+			group.possessive = node.possessive;
+
+			return group;
 		},
 
 		canHandle (txt) {

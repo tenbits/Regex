@@ -68,6 +68,7 @@ var RegexNode;
 
 			var nativeIndexerMatch = this.rgxIndexer.exec(match.value);
 			if (nativeIndexerMatch[0] !== match.value) {
+				logger.log(this.rgxIndexer, this.rgxSearch);
 				throw Error(`Indexer root missmatch ${nativeIndexerMatch[0]} ${match.value}`);
 			}
 
