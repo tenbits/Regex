@@ -13,6 +13,10 @@ var RegexNode;
 
 		constructor (text, node) {
 			var flags = node.serializeFlags();
+
+			if (flags.indexOf('g') === -1) {
+				flags += 'g';
+			}
 			this.rgxSearch = new RegExp(this.textContent, flags);
 
 			flags = flags.replace('g', '');

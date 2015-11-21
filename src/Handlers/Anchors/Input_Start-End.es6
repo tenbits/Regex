@@ -12,7 +12,6 @@ var InputStart,
 	});
 	InputEnd = create(ANCHOR_END, (node, root) => {
 		node.textContent = node.textContent + '$';
-		console.log(node.textContent);
 	});
 	InputEndWithNewLine = create(ANCHOR_END_WITH_NEWLINE, (node, root) => {
 		node.textContent = node.textContent + '\n?$';

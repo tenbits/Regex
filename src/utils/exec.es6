@@ -59,23 +59,37 @@ var exec_root,
 		return response;
 	};
 
-	exec_children = function(node, str, i, opts_, start, end) {
-		var matches = [], backtracking = [], opts = new Opts(opts_);
+	exec_children = function(node, str, i_, opts_, start, end) {
+		var matches = [],
+			backtracking = [],
+			opts = new Opts(opts_),
+			el = start || node.firstChild,
+			i = i_,
+			search = opts.fixed !== true
+				? new Backtrack(i_, 0, el, opts)
+				: null;
 
-		var el = start || node.firstChild;
 		while(el != end) {
 			var matcher = Matchers[el.type];
 			var match = el.exec ? el.exec(str, i, opts) : matcher(el, str, i, opts);
 			if (match == null) {
-				if (backtracking.length === 0) {
-					return null;
+				if (backtracking.length !== 0) {
+					var track = backtracking.pop();
+					i = track.strI;
+					el = track.el;
+					matches.splice(track.matchI);
+					opts = track.opts;
+					continue;
 				}
-				var track = backtracking.pop();
-				i = track.strI;
-				el = track.el;
-				matches.splice(track.matchI);
-				opts = track.opts;
-				continue;
+				if (search != null && matches.length !== 0) {
+					i = ++search.strI;
+					el = search.el;
+					matches.length = 0;
+					opts = search.opts;
+					backtrack_clearCursors(node);
+					continue;
+				}
+				return null;
 			}
 			if (el.isBacktracked) {
 				backtracking.push(new Backtrack(
@@ -85,9 +99,13 @@ var exec_root,
 					opts
 				));
 			}
+			if (search != null && matches.length === 0) {
+				search.strI = match.index;
+			}
+
 			i = opts.fixed
 				? i + match.value.length
-				: i + match.value.length + match.index;
+				: match.index + match.value.length;
 			matches.push(match);
 			opts.fixed = true;
 			el = el.nextSibling;

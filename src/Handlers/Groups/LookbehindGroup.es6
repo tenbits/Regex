@@ -78,6 +78,7 @@ var LookbehindGroup;
 		execAnchored (str, i, opts) {
 			var beforeString = str.substring(0, i),
 				beforeMatch = exec_children(this, beforeString, 0);
+
 			if (this.isPositive === true && beforeMatch == null) {
 				return null;
 			}

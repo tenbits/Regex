@@ -18,7 +18,6 @@ var GAnchorStatic;
 		[G_NEXT]: class_create(Node.Group, {
 			isNative: false,
 			exec (str, i) {
-				console.log(str, i);
 				var match = new Match;
 				match.index = i + 1;
 				match.value = '';

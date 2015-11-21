@@ -93,6 +93,20 @@ UTest({
 
 			deepEq_(match, x.match);
 		}));
+	},
+	'should except lb in OR' () {
+		var rgx = new Regex("(?i)\\bRFC(?: |(?<= RFC))(\\d+)\\b")
+		var match = rgx.match('-RFC12 RFC 14');
+		deepEq_(match, {
+			index: 7,
+			value: 'RFC 14',
+			groups: [
+				{
+					value: '14',
+					index: 11
+				}
+			]
+		});
 	}
 
 })
