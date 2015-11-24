@@ -17,12 +17,9 @@ module.exports = {
 		files: 'builds/**',
 		output: 'lib/'
 	},
-	'jshint': {
-		files: ['lib/ruta.js'],
-		jshint: JSHint()
-	},
+
 	'uglify': {
-		files: 'lib/ruta.js'
+		files: 'lib/regex.js'
 	},
 
 	'watch': {
@@ -30,10 +27,10 @@ module.exports = {
 		config: '#[import]'
 	},
 
-	'defaults': ['import', 'jshint', 'uglify']
+	'defaults': ['import', 'uglify']
 };
 function JSHint() {
-	
+
 	var options = {
 			"bitwise": false,
 			"camelcase": false,

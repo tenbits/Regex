@@ -31,8 +31,8 @@ var UnicodeCodePoint;
 				throw Error('Not supported wide hexadecimal char')
 			}
 
-			str = str_replaceByIndex(str, i, end + 1, '\\u' + name);
-			i += name.length;
+			str = str_replaceByIndex(str, i, end + 1, '\\u' + val);
+			i += val.length;
 		}
 		return str;
 	}
