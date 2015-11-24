@@ -18,7 +18,8 @@ var NoneCapturedGroup;
 		},
 
 		canHandle (txt) {
-			return txt.charCodeAt(1) === 58 /*:*/;
+			var c = txt.charCodeAt(1);
+			return c === 58 /*:*/ || c === 62;
 		}
 	};
 

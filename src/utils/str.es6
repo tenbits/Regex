@@ -1,7 +1,8 @@
 var str_isEscaped,
 	str_indexOfNewLine,
 	str_remove,
-	str_replaceByIndex;
+	str_replaceByIndex,
+	str_isInCharClass;
 (function(){
 
 	str_isEscaped = function(str, i) {
@@ -38,4 +39,23 @@ var str_isEscaped,
 	str_replaceByIndex = function(str, start, end, value) {
 		return str.substring(0, start) + value + str.substring(end);
 	};
+
+	str_isInCharClass = function (str, i) {
+		while(--i > -1) {
+			var c = str.charCodeAt(i);
+			if (c === 93 || c === 91) {
+				//[]
+				if (str_isEscaped(str, i)) {
+					continue;
+				}
+				if (c === 93) {
+					//]
+					return false;
+				}
+				// [
+				return true;
+			}
+		}
+		return false;
+	}
 }());

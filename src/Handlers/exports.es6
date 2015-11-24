@@ -23,6 +23,8 @@ var Handlers;
 	// import Literals/Subexpressions.es6
 	// import Literals/UnicodeCodePoint.es6
 	// import Literals/UnicodeCategory.es6
+	// import Literals/PosixCharClass.es6
+	// import Literals/NestedCharClass.es6
 
 	// import Anchors/Input_Start-End.es6
 	// import Anchors/InputLastMatch.es6
@@ -44,6 +46,7 @@ var Handlers;
 		[handler_NODE, PossessiveLiteral],
 		[handler_LITERAL, UnicodeCodePoint],
 		[handler_LITERAL, UnicodeCategory],
+		[handler_LITERAL, PosixCharClass],
 		[handler_LITERAL, InputStart],
 		[handler_LITERAL, InputEnd],
 		[handler_LITERAL, InputEndWithNewLine],
@@ -52,7 +55,8 @@ var Handlers;
 	];
 
 	var BeforeIndexed = [
-		[handler_LITERAL, Subexpressions]
+		[handler_LITERAL, Subexpressions],
+		[handler_LITERAL, NestedCharClass],
 	];
 
 	var AfterIndexed = [

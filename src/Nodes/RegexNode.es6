@@ -130,9 +130,21 @@ var RegexNode;
 			ast_indexShadowedGroups(root);
 
 			this.domIndexer = root;
-			this.rgxIndexer = new RegExp(root.toString(), flags);
+
+			var regex = root.toString();
+			if (rgx_groupBacktrack.test(regex)) {
+				regex = adjust_groupBacktracks(root, regex);
+			}
+			this.rgxIndexer = new RegExp(regex, flags);
 		}
 	});
+
+	function adjust_groupBacktracks(root, str){
+		var mappings = root.groupNumMapping;
+		return str.replace(rgx_groupBacktrack, function(full, c, num){
+			return c + '\\' + mappings[+num];
+		});
+	}
 
 	function resolveGroups(match, nativeMatch, pos) {
 		var imax = nativeMatch.length,
@@ -188,5 +200,7 @@ var RegexNode;
 		}
 		return false;
 	}
+
+	var rgx_groupBacktrack = /(^|[^\\])\\(\d+)/g;
 
 }())

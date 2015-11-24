@@ -73,14 +73,17 @@ var ast_combineNatives,
 
 	ast_indexShadowedGroups = function(root) {
 		var groupNum = 0, shadowGroupNum = 0;
+		root.groupNumMapping = {};
 		visitor_walkByType(root, Node.GROUP, node => {
 			if (node.isCaptured === false) {
 				return;
 			}
+			node.shadowGroupNum = ++shadowGroupNum;
 			if (node.isShadowGroup !== true) {
 				node.groupNum = ++groupNum;
+				root.groupNumMapping[node.groupNum] = shadowGroupNum;
 			}
-			node.shadowGroupNum = ++shadowGroupNum;
+
 
 			if (node.name != null) {
 				if (root.groups == null) {

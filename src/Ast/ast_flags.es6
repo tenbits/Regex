@@ -30,17 +30,7 @@ var ast_defineFlags;
 				handle_freeSpacing(group, visitor);
 			}
 			if (flags.i != null || flags.m != null) {
-
-				var current = flags_clone(group.getFlags());
-				flags = flags_extend(current, flags);
-
-				var parent = group.parentNode;
-				if (parent.type === Node.ROOT && parent.firstChild === group) {
-					parent.flags = flags;
-				} else {
-					group.getRoot().isNative = false;
-					handle_nativeFlags(group, flags, visitor);
-				}
+				handle_FlagsGlobal(group, visitor, flags);
 			}
 			if (visitor === visitByGroup) {
 				return removeGroup(group);
@@ -56,6 +46,25 @@ var ast_defineFlags;
 		var next = group.nextSibling;
 		dom_removeChild(group);
 		return next;
+	}
+
+	function handle_FlagsPartial (group, visitor, flags_) {
+		var current = flags_clone(group.getFlags());
+		var flags = flags_extend(current, flags_);
+
+		var parent = group.parentNode;
+		if (parent.type === Node.ROOT && parent.firstChild === group) {
+			parent.flags = flags;
+		} else {
+			group.getRoot().isNative = false;
+			handle_nativeFlags(group, flags, visitor);
+		}
+	}
+
+	function handle_FlagsGlobal (group, visitor, flags_) {
+		var current = flags_clone(group.getFlags());
+		var flags = flags_extend(current, flags_);
+		group.getRoot().flags = flags;
 	}
 
 	function handle_byGroup(group, flags, visitor) {
