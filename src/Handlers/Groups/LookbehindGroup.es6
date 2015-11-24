@@ -50,9 +50,12 @@ var LookbehindGroup;
 			return this.execSearch(str, i, opts)
 		},
 
-		execSearch (str, i, opts) {
+		execSearch (str, i, opts_) {
 			var next = this.nextSibling,
-				imax = str.length;
+				imax = str.length,
+				opts = new exec_Opts(opts_);
+
+			opts.indexed = false;
 			while( i < imax ) {
 				var match = exec_children(
 					this,
@@ -66,10 +69,9 @@ var LookbehindGroup;
 					return null;
 				}
 
+				exec_clearCursors(next);
 				i = match.index;
 				var isMatched;
-				debugger;
-
 				if (this.simpleChar != null) {
 					isMatched = (str[i - 1] === this.simpleChar);
 
@@ -84,11 +86,11 @@ var LookbehindGroup;
 					i++;
 					continue;
 				}
-				return {
-					index: i,
-					value: '',
-					groups: []
-				};
+
+				var result = new Match();
+				result.index = i;
+				result.value = '';
+				return result;
 			}
 		},
 
@@ -102,11 +104,10 @@ var LookbehindGroup;
 			else if (this.isPositive === false && beforeMatch != null) {
 				return null;
 			}
-			return {
-				value: '',
-				index: i,
-				groups: []
-			};
+			var match = new Match();
+			match.index = i;
+			match.value = '';
+			return match;
 		}
 	});
 

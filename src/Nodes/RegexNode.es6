@@ -27,7 +27,7 @@ var RegexNode;
 
 		exec (str_, i, opts) {
 			var str = str_;
-			if (this.cursor) {
+			if (this.cursor != null) {
 				str = str.substring(0, this.cursor.index + this.cursor.value.length - 1);
 			}
 
@@ -58,7 +58,7 @@ var RegexNode;
 			return this.resolveMatches(match, matchIndex, opts);
 		},
 
-		resolveMatches (nativeMatch, matchIndex) {
+		resolveMatches (nativeMatch, matchIndex, opts) {
 			var match = new Match();
 			match.value = nativeMatch[0];
 			match.index = matchIndex;
@@ -73,45 +73,12 @@ var RegexNode;
 				throw Error(`Indexer root missmatch ${nativeIndexerMatch[0]} ${match.value}`);
 			}
 
-			this.domIndexer.pos = matchIndex;
-			this.domIndexer.match = match.value;
-
-			visitor_walk(this.domIndexer, node => {
-				if (node.type === Node.OR) {
-					node.pos = node.parentNode.pos;
-				}
-				if (node.shadowGroupNum == null) {
-					return;
-				}
-				node.value = nativeIndexerMatch[node.shadowGroupNum];
-				var prev = node.previousSibling;
-				if (prev != null) {
-					var length = prev.value == null ? 0 : prev.value.length;
-					node.pos = prev.pos + length;
-					return;
-				}
-				node.pos = node.parentNode.pos;
-			});
-
-			visitor_walk(this.domIndexer, node => {
-				if (node.groupNum == null || node.groupNum === 0) {
-					return;
-				}
-				var shadowMatch = nativeIndexerMatch[node.shadowGroupNum];
-				var actualMatch = nativeMatch[node.groupNum];
-				if (actualMatch !== shadowMatch) {
-					throw Error(`Indexer group missmatch: ${actualMatch} ~~ ${shadowMatch}`);
-				}
-
-				var group = new MatchGroup();
-				group.value = actualMatch;
-				group.index = node.pos;
-				match.groups[node.groupNum - 1] = group;
-			});
+			if (opts && opts.indexed === false) {
+				resolveGroups(match, nativeMatch, matchIndex);
+			} else {
+				resolveIndexedGroups(match, nativeMatch, nativeIndexerMatch, this.domIndexer, matchIndex);
+			}
 			return match;
-		},
-		resolveMatch (str, group, groupNum) {
-			var match = this.rgxIndexer.exec(str);
 		},
 
 		compileIndexer (flags) {
@@ -166,6 +133,42 @@ var RegexNode;
 			this.rgxIndexer = new RegExp(root.toString(), flags);
 		}
 	});
+
+	function resolveGroups(match, nativeMatch, pos) {
+		var imax = nativeMatch.length,
+			i = 0;
+		while ( ++ i < imax ) {
+			var group = new MatchGroup();
+			group.value = nativeMatch[i];
+			match.groups[i - 1] = group;
+		}
+		return match;
+	}
+	function resolveIndexedGroups(match, nativeMatch, nativeIndexerMatch, node, pos) {
+		if (node.groupNum != null && node.groupNum !== 0) {
+			var shadowMatch = nativeIndexerMatch[node.shadowGroupNum];
+			var actualMatch = nativeMatch[node.groupNum];
+			if (actualMatch !== shadowMatch) {
+				throw Error(`Indexer group missmatch: ${actualMatch} ~~ ${shadowMatch}`);
+			}
+
+			var group = new MatchGroup();
+			group.value = actualMatch;
+			group.index = pos;
+			match.groups[node.groupNum - 1] = group;
+		}
+
+		var nextPos = pos;
+		for (var el = node.firstChild; el != null; el = el.nextSibling) {
+			nextPos = resolveGroups(match, nativeMatch, nativeIndexerMatch, el, nextPos);
+		}
+
+		if (node.shadowGroupNum != null && node.shadowGroupNum !== 0) {
+			var value = nativeIndexerMatch[node.shadowGroupNum] || '';
+			pos = pos + value.length;
+		}
+		return pos;
+	}
 
 	function hasRepetition(str) {
 		var imax = str.length,
