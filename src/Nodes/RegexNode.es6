@@ -75,7 +75,7 @@ var RegexNode;
 
 			if (opts && opts.indexed === false) {
 				resolveGroups(match, nativeMatch, matchIndex);
-			} else {
+			} else if (nativeMatch.length > 1) {
 				resolveIndexedGroups(match, nativeMatch, nativeIndexerMatch, this.domIndexer, matchIndex);
 			}
 			return match;
@@ -160,7 +160,7 @@ var RegexNode;
 
 		var nextPos = pos;
 		for (var el = node.firstChild; el != null; el = el.nextSibling) {
-			nextPos = resolveGroups(match, nativeMatch, nativeIndexerMatch, el, nextPos);
+			nextPos = resolveIndexedGroups(match, nativeMatch, nativeIndexerMatch, el, nextPos);
 		}
 
 		if (node.shadowGroupNum != null && node.shadowGroupNum !== 0) {

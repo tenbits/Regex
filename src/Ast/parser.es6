@@ -23,7 +23,7 @@ var parser_parseGroups;
 				if (c === 63 || c === 42 || c === 43 || c === 123) {
 					//?*+{
 					var repetition, lazy = false, possessive = false;
-					if (i === 123) {
+					if (c === 123) {
 						var end = str.indexOf('}', i);
 						repetition = str.substring(i, end + 1);
 						i = end;
