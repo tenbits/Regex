@@ -24,6 +24,7 @@ var Handlers;
 	// import Literals/UnicodeCodePoint.es6
 	// import Literals/UnicodeCategory.es6
 	// import Literals/PosixCharClass.es6
+	// import Literals/CharacterTypeHandler.es6
 	// import Literals/NestedCharClass.es6
 
 	// import Anchors/Input_Start-End.es6
@@ -47,6 +48,7 @@ var Handlers;
 		[handler_LITERAL, UnicodeCodePoint],
 		[handler_LITERAL, UnicodeCategory],
 		[handler_LITERAL, PosixCharClass],
+		[handler_LITERAL, CharacterTypeHandler],
 		[handler_LITERAL, InputStart],
 		[handler_LITERAL, InputEnd],
 		[handler_LITERAL, InputEndWithNewLine],

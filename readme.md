@@ -10,6 +10,8 @@ JavaScript Regular Expression Library for NodeJS and Browsers.
 
 - Named Groups `(?<name>expression)`, `(?'name'expression)`
 
+- Group index positions within the input
+
 - Named Backreferences `\k<name>`, `\k'name'`
 
 - Named subexpressions `\g<name>`
@@ -17,6 +19,8 @@ JavaScript Regular Expression Library for NodeJS and Browsers.
 - Comment Groups `(?# my comment)`
 
 - Atomic Groups `(?>ab|c)`
+
+	_Temporarly disabled for better performance. The group is converted into JS none-captured group._
 
 - Positive-/Negative Lookbehind `(?<=expression)` `(?<!expression)`
 
@@ -26,12 +30,23 @@ JavaScript Regular Expression Library for NodeJS and Browsers.
 
 - Options
     + `x` : `(?x) \\d #comment`
-    + `i` : `a(?i)b(?-i)c`
+    + `i` : `a(?i)b(?-i)c(?i:hello)`
+
+		_Temporarly disabled for better performance. The only first matched entry defines the flags for the expression_
 
 - Unicode
 
 	+ `\x{HEX}` : `\x{200D}`
 	+ `\p{CATEGORY}` : `\p{L}`
+
+- POSIX
+	+ `[:ascii:]`, `[:^ascii:]`, etc
+
+- Characters class
+	+ intersection: `[a-z&&[^c]]`
+
+- Character types
+	+ (non-) hexadecimal : `\h`, `\H`
 
 
 ### Named Groups

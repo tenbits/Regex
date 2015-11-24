@@ -1,0 +1,14 @@
+UTest({
+	'should match code point' () {
+		var rgx = new Regex('\\b(?i:(0x\\h*)L)');
+		var match = rgx.match('a = 0xFFL');
+		eq_(match.index, 4);
+		eq_(match.value, '0xFFL');
+		deepEq_(match.groups, [
+			{
+				index: 4,
+				value: '0xFF'
+			}
+		]);
+	}
+})
