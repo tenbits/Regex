@@ -10,7 +10,7 @@ var LookbehindGroup;
 				if (txt.length === 2 && txt[0] === '\\') {
 					lookbehind.simpleChar = txt[1];
 				}
-				node.firstChild.textContent = txt;
+				node.firstChild.textContent = '(' + txt + ')$';
 				return lookbehind;
 			}
 			visitor_walkByType(node, Node.LITERAL, x => {
@@ -50,10 +50,11 @@ var LookbehindGroup;
 			return this.execSearch(str, i, opts)
 		},
 
-		execSearch (str, i, opts_) {
+		execSearch (str, i_, opts_) {
 			var next = this.nextSibling,
 				imax = str.length,
-				opts = new exec_Opts(opts_);
+				opts = new exec_Opts(opts_),
+				i = i_;
 
 			opts.indexed = false;
 			while( i < imax ) {
@@ -76,7 +77,9 @@ var LookbehindGroup;
 					isMatched = (str[i - 1] === this.simpleChar);
 
 				} else {
-					var beforeString = str.substring(0, i);
+					var start = i - 20;
+					if (start < 0) start = 0;
+					var beforeString = str.substring(start, i);
 					var beforeMatch = exec_children(this, beforeString, 0, opts);
 					isMatched = beforeMatch != null;
 				}

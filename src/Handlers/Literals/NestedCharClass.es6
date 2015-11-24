@@ -7,15 +7,11 @@ var NestedCharClass;
 			node.textContent = interpolate(node.textContent);
 		},
 		canHandle (txt) {
-			return rgx.test(txt);
+			return rgx_NestedIntercept.test(txt);
 		}
 	};
 
-	var rgx = /\[.*&&\[/g;
-
-	var Ranges = {
-		'ascii': '\\u00000-\\u00127'
-	};
+	var rgx_NestedIntercept = /\[.*&&\[/g;
 
 	function interpolate(str_) {
 		var str = str_,
@@ -84,8 +80,8 @@ var NestedCharClass;
 				startInner = startInner + group.length - 1;
 			}
 
-			str = str.substring(0, startInner)
-				+ '(?:' + str.substring(startInner, i - 1)
+			str = str.substring(0, startOuter - 1)
+				+ '(?:' + str.substring(startOuter - 1, i - 1)
 				+ ')'
 				+ str.substring(i - 1);
 

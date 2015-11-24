@@ -95,7 +95,7 @@ var RegexNode;
 				var c2 = txt.charCodeAt(1);
 				if (c2 === 61 || c2 === 33) {
 					//=!
-					var next = node.nextSibling;
+					var next = node.parentNode.nextSibling;
 					dom_removeChild(node.parentNode);
 					return next;
 				}

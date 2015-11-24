@@ -1,5 +1,5 @@
 UTest({
-	'!should match predefined "move-next" static regexp' () {
+	'should match predefined "move-next" static regexp' () {
 		var rgx = new Regex('(?!\\G)');
 		var str = 'ab';
 		var match = rgx.match(str);

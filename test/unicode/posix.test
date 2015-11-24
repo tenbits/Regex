@@ -28,10 +28,9 @@ UTest({
 		eq_(match.groups[6].value, '"');
 		eq_(match.groups[7].value, ']');
 	},
-	'!should match attribte range' () {
+	'should match attribte range' () {
 		var rgx = new Regex("(?i)(\\[)\\s*(-?[_a-z\\\\[[:^ascii:]]][_a-z0-9\\-\\\\[[:^ascii:]]]*)(?:\\s*([~|^$*]?=)\\s*(?:(-?[_a-z\\\\[[:^ascii:]]][_a-z0-9\\-\\\\[[:^ascii:]]]*)|((?>(['\"])(?:[^\\\\]|\\\\.)*?(\\6)))))?\\s*(\\])");
 		var match = rgx.match('a[href^="#"]:after {');
-		logger.log(match);
 		eq_(match.index, 1);
 		eq_(match.groups[0].value, '[');
 		eq_(match.groups[1].value, 'href');
@@ -44,11 +43,8 @@ UTest({
 	},
 	'should match partial' () {
 		var rgx = new Regex('[a-z&&[^b]]+');
-
 		var match = rgx.match("acdbd");
-
 		eq_(match.index, 0);
 		eq_(match.value, 'acd');
-		logger.log(match);
 	}
 })

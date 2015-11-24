@@ -59,7 +59,6 @@ var parser_parseGroups;
 			}
 			if (c === 91 /* [ */) {
 				// [
-				debugger;
 				state = state_CHAR_CLASS;
 				continue;
 			}

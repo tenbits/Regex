@@ -108,7 +108,7 @@ UTest({
 			]
 		});
 	},
-	'!should unmatch with lookbehind' () {
+	'should unmatch with lookbehind' () {
 		var rgx = new Regex("(?<!\\.)\\b(boolean|byte|char|class|double|enum|float|function|int|interface|long|short|void)\\b");
 		var match = rgx.match('(function( window, undefined ) {');
 
