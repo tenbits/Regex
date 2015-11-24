@@ -19,6 +19,10 @@ var PosixCharClass;
 	var Ranges = {
 		'ascii': '\\u0000-\\u007F',
 		'^ascii': '\\u0080-\\uFFFF',
+		'space': '\\t\\n\\v\\f\\r\\x20',
+		'digit': '0-9',
+		'xdigit': '0-9a-fA-F',
+		'word': '\\w_'
 	};
 
 	function interpolate(str_, rgx) {
