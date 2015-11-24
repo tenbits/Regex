@@ -95,7 +95,7 @@ UTest({
 		}));
 	},
 	'should except lb in OR' () {
-		var rgx = new Regex("(?i)\\bRFC(?: |(?<= RFC))(\\d+)\\b")
+		var rgx = new Regex("(?i)\\bRFC(?: |(?<= RFC))(\\d+)\\b");
 		var match = rgx.match('-RFC12 RFC 14');
 		deepEq_(match, {
 			index: 7,
@@ -107,6 +107,25 @@ UTest({
 				}
 			]
 		});
+	},
+	'!should unmatch with lookbehind' () {
+		var rgx = new Regex("(?<!\\.)\\b(boolean|byte|char|class|double|enum|float|function|int|interface|long|short|void)\\b");
+		var match = rgx.match('(function( window, undefined ) {');
+
+		debugger;
+		has_(match, {
+			value: 'function',
+			index: 1,
+			groups: [
+				{
+					value: 'function',
+					index: 1
+				}
+			]
+		});
+
+		match = rgx.match("(.function boo)", 0);
+		eq_(match, null);
 	}
 
 })

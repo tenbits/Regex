@@ -3,3 +3,4 @@
 // import parser.es6
 // import ast.es6
 // import ast_flags.es6
+// import ast_compile.es6

@@ -1,6 +1,8 @@
 var Group = class_create(AstNode, {
 
 	index: 0,
+	groupNum: null,
+
 	type: type_Group,
 
 	name: null,

@@ -6,7 +6,7 @@ var Match,
 		value: null,
 		index: null,
 		groups: null,
-		groupIndex: null,
+		groupNum: null,
 		constructor () {
 			this.groups = [];
 		},

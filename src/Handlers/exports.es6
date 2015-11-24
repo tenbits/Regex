@@ -27,6 +27,7 @@ var Handlers;
 	// import Anchors/Input_Start-End.es6
 	// import Anchors/InputLastMatch.es6
 	// import Static/GAnchor.es6
+	// import Static/BAnchor.es6
 
 	var handler_GROUP = 0,
 		handler_LITERAL = 1,
@@ -47,6 +48,7 @@ var Handlers;
 		[handler_LITERAL, InputEnd],
 		[handler_LITERAL, InputEndWithNewLine],
 		[handler_LITERAL, InputLastMatch],
+		//[handler_LITERAL, BAnchorStatic],
 	];
 
 	var BeforeIndexed = [
@@ -56,6 +58,10 @@ var Handlers;
 	var AfterIndexed = [
 		[handler_LITERAL, NamedBackreference]
 	];
+
+	var AfterCombined = [
+		//[handler_GROUP, BAnchorStatic],
+	]
 
 
 	function walk(root, handlers) {

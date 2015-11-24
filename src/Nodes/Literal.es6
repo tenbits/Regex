@@ -8,5 +8,9 @@ var Literal = class_create(RegexOpts, {
 
 	toString () {
 		return this.textContent;
+	},
+
+	checkNative () {
+		return true;
 	}
 });

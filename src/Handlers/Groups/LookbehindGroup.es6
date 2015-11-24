@@ -5,6 +5,14 @@ var LookbehindGroup;
 
 		create (node) {
 			var lookbehind = new Lookbehind(node);
+			if (node.firstChild === node.lastChild && node.firstChild.type === Node.LITERAL) {
+				var txt = node.firstChild.textContent.replace(rgx_LBGroup, '');
+				if (txt.length === 2 && txt[0] === '\\') {
+					lookbehind.simpleChar = txt[1];
+				}
+				node.firstChild.textContent = txt;
+				return lookbehind;
+			}
 			visitor_walkByType(node, Node.LITERAL, x => {
 				var txt = x.textContent;
 				x.textContent = '(' + txt.replace(rgx_LBGroup, '') + ')$';
@@ -27,9 +35,8 @@ var LookbehindGroup;
 		isNative: false,
 		isPositive: true,
 
-		group: null,
+		simpleChar: null,
 		constructor (node) {
-			this.group = node;
 			node.isNative = false;
 			node.isCaptured = false;
 
@@ -60,10 +67,20 @@ var LookbehindGroup;
 				}
 
 				i = match.index;
-				var beforeString = str.substring(0, i);
-				var beforeMatch = exec_children(this, beforeString, 0, opts);
-				if ((beforeMatch == null && this.isPositive === true) ||
-					(beforeMatch != null && this.isPositive === false)) {
+				var isMatched;
+				debugger;
+
+				if (this.simpleChar != null) {
+					isMatched = (str[i - 1] === this.simpleChar);
+
+				} else {
+					var beforeString = str.substring(0, i);
+					var beforeMatch = exec_children(this, beforeString, 0, opts);
+					isMatched = beforeMatch != null;
+				}
+
+				if ((isMatched === false && this.isPositive === true) ||
+					(isMatched === true && this.isPositive === false)) {
 					i++;
 					continue;
 				}

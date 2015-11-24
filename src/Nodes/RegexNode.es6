@@ -8,12 +8,11 @@ var RegexNode;
 		rgxIndexer: null,
 		domIndexer: null,
 
-		groupIndex: null,
+		groupNum: null,
 		root: null,
 
 		constructor (text, node) {
 			var flags = node.serializeFlags();
-
 			if (flags.indexOf('g') === -1) {
 				flags += 'g';
 			}
@@ -22,7 +21,7 @@ var RegexNode;
 			flags = flags.replace('g', '');
 			this.rgxFixed = new RegExp('^' + this.textContent, flags);
 			this.compileIndexer(flags);
-			this.groupIndex = node.index;
+			this.groupNum = node.groupNum;
 			this.isBacktracked = hasRepetition(text);
 		},
 
@@ -63,12 +62,14 @@ var RegexNode;
 			var match = new Match();
 			match.value = nativeMatch[0];
 			match.index = matchIndex;
-			match.groupIndex = this.groupIndex;
+			match.groupNum = this.groupNum;
 
+			if (match.value === '') {
+				return match;
+			}
 
 			var nativeIndexerMatch = this.rgxIndexer.exec(match.value);
 			if (nativeIndexerMatch[0] !== match.value) {
-				logger.log(this.rgxIndexer, this.rgxSearch);
 				throw Error(`Indexer root missmatch ${nativeIndexerMatch[0]} ${match.value}`);
 			}
 
@@ -79,10 +80,10 @@ var RegexNode;
 				if (node.type === Node.OR) {
 					node.pos = node.parentNode.pos;
 				}
-				if (node.shadowIndex == null) {
+				if (node.shadowGroupNum == null) {
 					return;
 				}
-				node.value = nativeIndexerMatch[node.shadowIndex];
+				node.value = nativeIndexerMatch[node.shadowGroupNum];
 				var prev = node.previousSibling;
 				if (prev != null) {
 					var length = prev.value == null ? 0 : prev.value.length;
@@ -93,11 +94,11 @@ var RegexNode;
 			});
 
 			visitor_walk(this.domIndexer, node => {
-				if (node.index == null || node.index === 0) {
+				if (node.groupNum == null || node.groupNum === 0) {
 					return;
 				}
-				var shadowMatch = nativeIndexerMatch[node.shadowIndex];
-				var actualMatch = nativeMatch[node.index];
+				var shadowMatch = nativeIndexerMatch[node.shadowGroupNum];
+				var actualMatch = nativeMatch[node.groupNum];
 				if (actualMatch !== shadowMatch) {
 					throw Error(`Indexer group missmatch: ${actualMatch} ~~ ${shadowMatch}`);
 				}
@@ -105,16 +106,34 @@ var RegexNode;
 				var group = new MatchGroup();
 				group.value = actualMatch;
 				group.index = node.pos;
-				match.groups[node.index - 1] = group;
+				match.groups[node.groupNum - 1] = group;
 			});
 			return match;
 		},
-		resolveMatch (str, group, groupIndex) {
+		resolveMatch (str, group, groupNum) {
 			var match = this.rgxIndexer.exec(str);
 		},
 
 		compileIndexer (flags) {
 			var root = parser_parseGroups(this.textContent);
+			visitor_walk(root, function(node){
+				if (node.type !== Node.LITERAL) {
+					return;
+				}
+				var txt = node.textContent;
+				var c1 = txt.charCodeAt(0);
+				if (c1 !== 63 /*?*/) {
+					return;
+				}
+				var c2 = txt.charCodeAt(1);
+				if (c2 === 61 || c2 === 33) {
+					//=!
+					var next = node.nextSibling;
+					dom_removeChild(node.parentNode);
+					return next;
+				}
+			});
+
 			Handlers.define(root);
 
 			visitor_walkUp(root, node => {

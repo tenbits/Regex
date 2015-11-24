@@ -67,5 +67,17 @@ var AstNode = class_create(RegexOpts, {
 			l++;
 		}
 		return l;
+	},
+
+	checkNative () {
+		if (this.isNative === false) {
+			return false;
+		}
+		for(var el = this.firstChild; el != null; el = el.nextSibling) {
+			if (el.checkNative() === false) {
+				return false;
+			}
+		}
+		return true;
 	}
 });

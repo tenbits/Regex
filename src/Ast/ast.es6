@@ -48,45 +48,45 @@ var ast_combineNatives,
 
 	ast_combineNatives = function (root) {
 		resolveNatives(root);
+		debugger;
 		combineNatives(root);
 	};
 	ast_compileNatives = function(root) {
 		return compileNatives(root);
 	};
 	ast_indexGroups = function(root) {
-		var index = 0;
+		var groupNum = 0;
 		visitor_walkByType(root, Node.GROUP, node => {
 			if (node.isCaptured === false) {
 				return;
 			}
-			node.index = ++index;
+			node.groupNum = ++groupNum;
 			if (node.name != null) {
 
 				if (root.groups == null)
 					root.groups = {};
 
-				root.groups[node.name] = node.index;
+				root.groups[node.name] = node.groupNum;
 			}
 		});
 	};
 
 	ast_indexShadowedGroups = function(root) {
-		var index = 0, shadowIndex = 0;
+		var groupNum = 0, shadowGroupNum = 0;
 		visitor_walkByType(root, Node.GROUP, node => {
 			if (node.isCaptured === false) {
 				return;
 			}
 			if (node.isShadowGroup !== true) {
-				node.index = ++index;
+				node.groupNum = ++groupNum;
 			}
-			node.shadowIndex = ++shadowIndex;
+			node.shadowGroupNum = ++shadowGroupNum;
 
 			if (node.name != null) {
-
-				if (root.groups == null)
+				if (root.groups == null) {
 					root.groups = {};
-
-				root.groups[node.name] = node.index;
+				}
+				root.groups[node.name] = node.groupNum;
 			}
 		});
 	};
@@ -177,8 +177,8 @@ var ast_combineNatives,
 			var str = '', cursor = startEl;
 			while(cursor !== endEl) {
 				str += cursor.toString();
-				if (cursor.type === Node.GROUP && literal.index == null) {
-					literal.index = cursor.index;
+				if (cursor.type === Node.GROUP && literal.groupNum == null) {
+					literal.groupNum = cursor.groupNum;
 				}
 
 				dom_removeChild(cursor);

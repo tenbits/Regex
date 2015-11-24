@@ -60,11 +60,13 @@ var exec_root,
 	};
 
 	exec_children = function(node, str, i_, opts_, start, end) {
+
 		var matches = [],
 			backtracking = [],
 			opts = new Opts(opts_),
 			el = start || node.firstChild,
 			i = i_,
+			imax = str.length,
 			search = opts.fixed !== true
 				? new Backtrack(i_, 0, el, opts)
 				: null;
@@ -83,6 +85,9 @@ var exec_root,
 				}
 				if (search != null && matches.length !== 0) {
 					i = ++search.strI;
+					if (i >= imax) {
+						return null;
+					}
 					el = search.el;
 					matches.length = 0;
 					opts = search.opts;
@@ -145,8 +150,8 @@ var exec_root,
 			if (match == null) {
 				return null;
 			}
-			if (rgx.index != null) {
-				match.groupIndex = rgx.index;
+			if (rgx.groupNum != null) {
+				match.groupNum = rgx.groupNum;
 			}
 			return match;
 		},
@@ -229,8 +234,8 @@ var exec_root,
 
 			out.value += match.value;
 
-			if (match.groupIndex != null) {
-				var pos = match.groupIndex - 1,
+			if (match.groupNum != null) {
+				var pos = match.groupNum - 1,
 					length = pos + groups.length - 1;
 				while (out.groups.length < length) {
 					out.groups[out.groups.length++] = null;
@@ -267,8 +272,8 @@ var exec_root,
 				arr[j] = groups[j].value;
 			}
 
-			if (match.groupIndex != null) {
-				var pos = match.groupIndex,
+			if (match.groupNum != null) {
+				var pos = match.groupNum - 1,
 					length = pos + jmax - 1;
 				while (out.groups.length < length) {
 					out[out.length++] = null;
