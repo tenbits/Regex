@@ -23,7 +23,13 @@ var UnicodeCodePoint;
 				continue;
 			}
 			var end = str.indexOf(str_END, i);
-			var name = str.substring(i + str_START.length, end);
+			var val = str.substring(i + str_START.length, end);
+			if (val.length == 2) {
+				val += '00' + val;
+			}
+			if (val.length !== 4) {
+				throw Error('Not supported wide hexadecimal char')
+			}
 
 			str = str_replaceByIndex(str, i, end + 1, '\\u' + name);
 			i += name.length;
