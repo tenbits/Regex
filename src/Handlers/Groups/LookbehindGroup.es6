@@ -32,8 +32,9 @@ var LookbehindGroup;
 	var Lookbehind = class_create(Node.Group, {
 
 		isCaptured: false,
-		isNative: false,
+		isIncluded: false,
 		isPositive: true,
+		isNative: false,
 
 		simpleChar: null,
 		constructor (node) {

@@ -1,4 +1,5 @@
-var NoneCapturedGroup;
+var NoneCapturedGroup,
+	NoneCapturedGroupNode;
 
 (function(){
 
@@ -24,7 +25,7 @@ var NoneCapturedGroup;
 	};
 
 
-	var NoneCapturedGroupNode = class_create(Node.Group, {
+	NoneCapturedGroupNode = class_create(Node.Group, {
 		isCaptured: false,
 
 		toString () {

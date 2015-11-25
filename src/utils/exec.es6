@@ -5,7 +5,7 @@ var exec_root,
 (function(){
 
 	exec_root = function (root, str, i, opts) {
-		backtrack_clearCursors(root)
+		backtrack_clearCursors(root);
 		var match = exec_children(root, str, i, opts);
 		if (match == null) {
 			return null;

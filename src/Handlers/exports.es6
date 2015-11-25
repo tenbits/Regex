@@ -9,6 +9,9 @@ var Handlers;
 		},
 		afterIndexed (root) {
 			walk(root, AfterIndexed);
+		},
+		afterCombined (root) {
+			walk(root, AfterCombined);
 		}
 	};
 
@@ -17,6 +20,7 @@ var Handlers;
 	// import Groups/AtomicGroup.es6
 	// import Groups/NamedGroup.es6
 	// import Groups/LookbehindGroup.es6
+	// import Groups/LookaheadGroup.es6
 
 	// import Possessive.es6
 	// import Literals/NamedBackreference.es6
@@ -43,6 +47,7 @@ var Handlers;
 		[handler_GROUP, AtomicGroup],
 		[handler_GROUP, GAnchorStatic],
 		[handler_GROUP, LookbehindGroup],
+		[handler_GROUP, LookaheadGroup],
 		[handler_NODE, PossessiveGroup],
 		[handler_NODE, PossessiveLiteral],
 		[handler_LITERAL, UnicodeCodePoint],
@@ -53,12 +58,12 @@ var Handlers;
 		[handler_LITERAL, InputEnd],
 		[handler_LITERAL, InputEndWithNewLine],
 		[handler_LITERAL, InputLastMatch],
-		//[handler_LITERAL, BAnchorStatic],
 	];
 
 	var BeforeIndexed = [
 		[handler_LITERAL, Subexpressions],
 		[handler_LITERAL, NestedCharClass],
+		[handler_LITERAL, BAnchorStatic],
 	];
 
 	var AfterIndexed = [
@@ -66,7 +71,7 @@ var Handlers;
 	];
 
 	var AfterCombined = [
-		//[handler_GROUP, BAnchorStatic],
+
 	]
 
 

@@ -247,6 +247,14 @@ UTest({
 		var rgx = new Regex("(?<![-a-z])(?=[-a-z])");
 		var match = rgx.match("vv;al", 1)
 		eq_(match.index, 3);
+	},
+
+	'!should find keyword' () {
+		var rgx = new Regex('(?x)\n\t\t\t\t(?<![\\.\\$])\\b(\n\t\t\t\t\tbreak|by|catch|continue|else|finally|for|in|of|if|return|switch|\n\t\t\t\t\tthen|throw|try|unless|when|while|until|loop|do|(?<=for)\\s+own\n\t\t\t\t)(?!\\s*:)\\b\n\t\t\t');
+		console.log(rgx.root.toString());
+
+		var match = rgx.match('return');
+		eq_(match.value, 'return');
 	}
 });
 

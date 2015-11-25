@@ -36,7 +36,6 @@ Regex.parse = function (str, flags) {
 	var root = parser_parseGroups(str);
 
 	ast_defineFlags(root, flags);
-
 	Handlers.define(root);
 	Handlers.beforeIndexed(root);
 
@@ -44,8 +43,9 @@ Regex.parse = function (str, flags) {
 	Handlers.afterIndexed(root);
 
 	ast_combineNatives(root);
-	ast_createBlocks(root);
+	Handlers.afterCombined(root);
 
+	ast_createBlocks(root);
 	ast_compileNatives(root);
 	ast_resolveBacktracks(root);
 	return root;

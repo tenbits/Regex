@@ -70,10 +70,9 @@ var ast_combineNatives,
 			}
 			el = combineNodes(el) || el;
 			if (hasAlternation === true) {
-				continue;
+				//continue;
 			}
 			if (canBeJoined(el, startEl) === true) {
-
 				if (startEl == null) {
 					startEl = el;
 				}

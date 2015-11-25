@@ -26,5 +26,20 @@ UTest({
 		var lookbehind = rgx.root.firstChild;
 		var regex = lookbehind.nextSibling;
 		eq_(regex.textContent, nativeRegex);
+	},
+	'should move B anchor to literal': {
+		'simple move to literal' () {
+			var rgx = new Regex('\\b(?<=FOO)BAZ');
+			eq_(rgx.root.lastChild.textContent, '\\bBAZ');
+		},
+		'simple wrap of the group' () {
+			var rgx = new Regex('(BAZ|QUX)(?=FOO)\\b');
+			eq_(rgx.root.firstChild.textContent, '((?:BAZ|QUX))\\b(?=FOO)');
+		},
+		'!move to group items' () {
+			var rgx = new Regex('(BAZ|((?<!q)QUX))(?=FOO)\\b');
+			var str = rgx.root.toString();
+			eq_(str, '(BAZ\\b|(((q)$)QUX\\b))(?=FOO)');
+		}
 	}
 })
