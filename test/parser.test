@@ -36,10 +36,18 @@ UTest({
 			var rgx = new Regex('(BAZ|QUX)(?=FOO)\\b');
 			eq_(rgx.root.firstChild.textContent, '((?:BAZ|QUX))\\b(?=FOO)');
 		},
-		'!move to group items' () {
+		'move to group items' () {
 			var rgx = new Regex('(BAZ|((?<!q)QUX))(?=FOO)\\b');
 			var str = rgx.root.toString();
 			eq_(str, '(BAZ\\b|(((q)$)QUX\\b))(?=FOO)');
 		}
+	},
+	'should parse possessive group without exception' () {
+		var rgx = new Regex("(?x)   ( ( ( a ( s ) d ) ) )++ ");
+	},
+	'!should parse lookahead' () {
+		var rgx = new Regex("\"/(?=(\\\\.|[^\"/])++/[imsxeADSUXu]*\")");
+		var match = rgx.match('var a = "/as/"');
+		eq_(match.value, '"/');
 	}
 })

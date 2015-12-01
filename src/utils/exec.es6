@@ -4,8 +4,12 @@ var exec_root,
 	exec_Opts;
 (function(){
 
-	exec_root = function (root, str, i, opts) {
+	exec_root = function (root, str, i, opts_) {
 		backtrack_clearCursors(root);
+
+		var opts = new exec_Opts(opts_);
+		opts.lastIndex = i;
+debugger;
 		var match = exec_children(root, str, i, opts);
 		if (match == null) {
 			return null;
@@ -18,7 +22,7 @@ var exec_root,
 				imax = fns.length,
 				i = -1;
 			while( ++i < imax ) {
-				match = fns[i](root, match);
+				match = fns[i](str, match, root);
 				if (match == null) {
 					return null;
 				}
@@ -72,18 +76,22 @@ var exec_root,
 				: null;
 
 		while(el != end) {
+			if (i >= imax) {
+				return null;
+			}
 			var matcher = Matchers[el.type];
 			var match = el.exec ? el.exec(str, i, opts) : matcher(el, str, i, opts);
 			if (match == null) {
 				if (backtracking.length !== 0) {
 					var track = backtracking.pop();
-					i = track.strI;
+					i = ++track.strI;
 					el = track.el;
 					matches.splice(track.matchI);
 					opts = track.opts;
 					continue;
 				}
-				if (search != null && matches.length !== 0) {
+
+				if (search && matches.length !== 0) {
 					i = ++search.strI;
 					if (i >= imax) {
 						return null;
@@ -130,11 +138,13 @@ var exec_root,
 	var Opts = exec_Opts = function(current){
 		this.fixed = false;
 		this.indexed = false;
+		this.lastIndex = 0;
 		if (current == null) {
 			return;
 		}
 		this.fixed = current.fixed;
 		this.indexed = current.indexed;
+		this.lastIndex = current.lastIndex;
 	};
 
 	var Matchers = {
@@ -160,7 +170,7 @@ var exec_root,
 			if (match == null) {
 				return null;
 			}
-			if (group.isCaptured !== false) {
+			if (group.isCaptured !== false && group.isIncluded !== false) {
 				var group = new MatchGroup();
 				group.value = match.value;
 				group.index = match.index;
@@ -235,14 +245,14 @@ var exec_root,
 			out.value += match.value;
 
 			if (match.groupNum != null) {
-				var pos = match.groupNum - 1,
-					length = pos + groups.length - 1;
-				while (out.groups.length < length) {
+				var pos = match.groupNum - 1;
+				while (out.groups.length < pos) {
 					out.groups[out.groups.length++] = null;
 				}
 				out.groups.splice(pos, 0, ...groups);
 				continue;
 			}
+
 			out.groups = out.groups.concat(groups);
 		}
 		return out;

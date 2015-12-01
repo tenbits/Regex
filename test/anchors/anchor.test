@@ -1,0 +1,49 @@
+var STR = `longggggggggggggggggggggggggggggggggggggggggggggggg
+# Please enter the commit message for your changes. Lines starting
+`;
+
+UTest({
+	'matches start of line' () {
+		var rgx = new Regex('\\A(?!#)')
+		var match = rgx.match(STR);
+		eq_(match.value, '');
+		eq_(match.index, 0);
+	},
+	'lookahead' () {
+		var rgx = new Regex('(?=# Please enter the commit message)')
+		var match = rgx.match(STR);
+		eq_(match.value, '');
+		eq_(match.index, STR.indexOf('#'));
+	},
+	'too long' () {
+		var rgx = new Regex('.{51,}$')
+		var match = rgx.match(STR);
+		eq_(match.value, 'longggggggggggggggggggggggggggggggggggggggggggggggg');
+		eq_(match.index, STR.indexOf('longggggggggggggggggggggggggggggggggggggggggggggggg'));
+	},
+	'begin' () {
+		var rgx = new Regex('\\G')
+		var match = rgx.match(STR, 5);
+		eq_(match.value, '');
+		eq_(match.index, 5);
+	},
+	'end' () {
+		var rgx = new Regex('^(?!\\G)')
+		var match = rgx.match(STR, 0);
+		eq_(match.value, '');
+		var i = STR.indexOf('\n', 10) + 1;
+		eq_(match.index, i);
+	},
+	'next' () {
+		var rgx = new Regex('(?!\\G)')
+		var match = rgx.match(STR, 0);
+		eq_(match.value, '');
+		eq_(match.index, 1);
+	},
+	'!empty regex' () {
+		var rgx = new Regex('')
+		var match = rgx.match(STR, 4);
+		eq_(match.value, '');
+		eq_(match.index, 4);
+	}
+})

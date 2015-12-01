@@ -79,5 +79,15 @@ var AstNode = class_create(RegexOpts, {
 			}
 		}
 		return true;
+	},
+	checkIncluded () {
+		var el = this;
+		while(el != null) {
+			if (el.isIncluded === false) {
+				return false;
+			}
+			el = el.parentNode;
+		}
+		return true;
 	}
 });

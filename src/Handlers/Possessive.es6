@@ -1,4 +1,5 @@
 var PossessiveGroup,
+	PossessiveGroupNode,
 	PossessiveLiteral;
 
 (function(){
@@ -18,13 +19,20 @@ var PossessiveGroup,
 	};
 
 	PossessiveLiteral = {
+		transform (node) {
+			node.textContent = node.textContent.replace(rgx_possessiveCharClass, (full, g1, g2) => {
+				return g1 + g2;
+			});
+		},
 		canHandle (txt, root) {
-
+			return rgx_possessiveCharClass.test(txt);
 		}
 	};
 
-	var PossessiveGroupNode = class_create(Node.Group, {
-		isNative: false,
+	var rgx_possessiveCharClass = /([^\\])([\*\+])\+/g;
+
+	PossessiveGroupNode = class_create(Node.Group, {
+		isNative: true,
 		isBacktracked: false,
 		compiled: false,
 		isAtomic: true,
@@ -32,16 +40,12 @@ var PossessiveGroup,
 			this.isCaptured = group.isCaptured;
 			this.repetition = group.repetition;
 		},
-
-		compile () {
-			for(var el = this.firstChild; el != null; el = el.nextSibling) {
-				if (el.type !== Node.LITERAL) {
-					this.compiled = false;
-					continue;
-				}
-				el.textContent = `(?:${el.textContent})+`;
+		toString () {
+			var str = Node.Group.prototype.toString.call(this)
+			if (this.isCaptured === true) {
+				return str;
 			}
-			ast_compileNatives(this);
+			return '(?:' + str.substring(1);
 		}
 	});
 

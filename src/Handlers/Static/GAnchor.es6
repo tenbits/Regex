@@ -17,7 +17,10 @@ var GAnchorStatic;
 	var Groups = {
 		[G_NEXT]: class_create(Node.Group, {
 			isNative: false,
-			exec (str, i) {
+			exec (str, i, opts) {
+				if (opts.fixed === true && i === opts.lastIndex) {
+					return null;
+				}
 				var match = new Match;
 				match.index = i + 1;
 				match.value = '';

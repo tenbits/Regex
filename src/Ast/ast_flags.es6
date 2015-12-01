@@ -36,7 +36,7 @@ var ast_defineFlags;
 				return removeGroup(group);
 			}
 			if (visitor === visitByInline) {
-				node.textContent = '?' + txt.substring(txt.indexOf(':'));
+				node.textContent = '?' + node.textContent.substring(node.textContent.indexOf(':'));
 				return null;
 			}
 		});

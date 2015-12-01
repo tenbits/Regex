@@ -9,11 +9,17 @@ var NoneCapturedGroup,
 			var literal = node.firstChild,
 				txt = literal.textContent;
 
+
 			literal.textContent = txt.substring(2);
 			var group = new NoneCapturedGroupNode();
 			group.repetition = node.repetition;
 			group.lazy = node.lazy;
 			group.possessive = node.possessive;
+
+			if (group.possessive) {
+				return new PossessiveGroupNode(group);
+			}
+
 
 			return group;
 		},

@@ -93,10 +93,10 @@ var BAnchorStatic;
 		while(child != null) {
 			dom_removeChild(child);
 			dom_appendChild(wrapper, child);
-			child = el.firstChild;
+			child = group.firstChild;
 		}
-		dom_appendChild(wrapper, group);
-		appenderFn(el, dom_clone(node));
+		dom_appendChild(group, wrapper);
+		appenderFn(wrapper, dom_clone(bNode));
 		return true;
 	}
 

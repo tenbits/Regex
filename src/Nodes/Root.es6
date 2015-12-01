@@ -31,7 +31,11 @@ var Root = class_create(Block, {
 	addTransformer (fn) {
 		if (this.transformers == null)
 			this.transformers = [];
-
 		this.transformers.push(fn);
+	},
+	addFilter (fn) {
+		if (this.filters == null)
+			this.filters = [];
+		this.filters.push(fn);
 	}
 });

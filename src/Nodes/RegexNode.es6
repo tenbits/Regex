@@ -18,7 +18,7 @@ var RegexNode;
 			}
 			this.rgxSearch = new RegExp(this.textContent, flags);
 
-			flags = flags.replace('g', '');
+			flags = flags.replace(/[gm]/g, '');
 			this.rgxFixed = new RegExp('^' + this.textContent, flags);
 			this.compileIndexer(flags);
 			this.groupNum = node.groupNum;
@@ -30,7 +30,6 @@ var RegexNode;
 			if (this.cursor != null) {
 				str = str.substring(0, this.cursor.index + this.cursor.value.length - 1);
 			}
-
 			var regex, match, matchIndex;
 			if (opts.fixed) {
 				var sub = str.substring(i);
@@ -55,7 +54,9 @@ var RegexNode;
 					index: matchIndex
 				};
 			}
-			return this.resolveMatches(match, matchIndex, opts);
+
+			var iMatch = this.resolveMatches(match, matchIndex, opts);
+			return iMatch;
 		},
 
 		resolveMatches (nativeMatch, matchIndex, opts) {
@@ -83,23 +84,6 @@ var RegexNode;
 
 		compileIndexer (flags) {
 			var root = parser_parseGroups(this.textContent);
-			visitor_walk(root, function(node){
-				if (node.type !== Node.LITERAL) {
-					return;
-				}
-				var txt = node.textContent;
-				var c1 = txt.charCodeAt(0);
-				if (c1 !== 63 /*?*/) {
-					return;
-				}
-				var c2 = txt.charCodeAt(1);
-				if (c2 === 61 || c2 === 33) {
-					//=!
-					var next = node.parentNode.nextSibling;
-					dom_removeChild(node.parentNode);
-					return next;
-				}
-			});
 
 			Handlers.define(root);
 
@@ -111,9 +95,17 @@ var RegexNode;
 				if (parent.firstChild === parent.lastChild) {
 					return;
 				}
-
+				if (node.checkIncluded() === false) {
+					return;
+				}
 				if (node.type === Node.GROUP) {
 					if (node.repetition == null && node.isCaptured !== false) {
+						return;
+					}
+				}
+				if (node.type === Node.LITERAL) {
+					var txt = node.textContent;
+					if (txt === '\\b') {
 						return;
 					}
 				}
@@ -128,14 +120,21 @@ var RegexNode;
 			});
 
 			ast_indexShadowedGroups(root);
-
-			this.domIndexer = root;
+			visitor_walk(root, function(node){
+				if (node.isIncluded === false) {
+					var next = node.nextSibling;
+					dom_removeChild(node);
+					return next;
+					return;
+				}
+			});
 
 			var regex = root.toString();
 			if (rgx_groupBacktrack.test(regex)) {
 				regex = adjust_groupBacktracks(root, regex);
 			}
 			this.rgxIndexer = new RegExp(regex, flags);
+			this.domIndexer = root;
 		}
 	});
 
@@ -181,6 +180,7 @@ var RegexNode;
 		}
 		return pos;
 	}
+
 
 	function hasRepetition(str) {
 		var imax = str.length,

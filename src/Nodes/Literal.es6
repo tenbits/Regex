@@ -1,4 +1,4 @@
-var Literal = class_create(RegexOpts, {
+var Literal = class_create(AstNode, {
 
 	type: type_Literal,
 

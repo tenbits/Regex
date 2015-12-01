@@ -24,11 +24,14 @@ var UnicodeCodePoint;
 			}
 			var end = str.indexOf(str_END, i);
 			var val = str.substring(i + str_START.length, end);
-			if (val.length == 2) {
-				val += '00' + val;
+			if (val.length === 6) {
+				continue;
+			}
+			if (val.length === 2) {
+				val = '00' + val;
 			}
 			if (val.length !== 4) {
-				throw Error('Not supported wide hexadecimal char')
+				throw Error('Not supported wide hexadecimal char: ' + val);
 			}
 
 			str = str_replaceByIndex(str, i, end + 1, '\\u' + val);

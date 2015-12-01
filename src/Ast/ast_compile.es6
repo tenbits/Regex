@@ -31,6 +31,9 @@ var ast_combineNatives,
 	}
 
 	function combineNodes(node, root) {
+		if (node.type === Node.LITERAL || node.type === Node.OR) {
+			return node;
+		}
 		var startEl, el, hasCustom = false, hasAlternation = false;
 		if (node !== root && node.parentNode.firstChild !== node && node.parentNode.lastChild !== node) {
 			for (el = node.firstChild; el != null; el = el.nextSibling) {
@@ -66,13 +69,10 @@ var ast_combineNatives,
 
 		for (el = node.firstChild; el != null; el = el.nextSibling) {
 			if (el.type === Node.OR) {
-				continue;
+				hasAlternation = true;
 			}
 			el = combineNodes(el) || el;
-			if (hasAlternation === true) {
-				//continue;
-			}
-			if (canBeJoined(el, startEl) === true) {
+			if (el.type !== Node.OR && canBeJoined(el, startEl) === true) {
 				if (startEl == null) {
 					startEl = el;
 				}
@@ -88,20 +88,22 @@ var ast_combineNatives,
 				endEl = endEl.previousSibling;
 			}
 
-			joinNodesInLiteral(startEl, endEl);
+			toLiteral(startEl, el);
 			startEl = null;
 		}
 
-		if (hasCustom === false && node.isNative !== false && node !== root) {
-			return joinSingleNodeInLiteral(node);
+		if (hasCustom === false && hasAlternation === false && node.checkNative() === true && node !== root) {
+			return toLiteral(node, void 0);
 		}
 		if (startEl != null) {
-			joinNodesInLiteral(startEl, null);
+			toLiteral(startEl, null);
 		}
 		return null;
 	}
 
 	function canBeJoined (node, startNode) {
+		return node.checkNative();
+
 		if (node.isNative === false) {
 			return false;
 		}
@@ -122,34 +124,33 @@ var ast_combineNatives,
 		return true;
 	}
 
-	// [start, end)
-	function joinNodesInLiteral(startEl, endEl) {
+
+	// [start, end?)
+	function toLiteral(startEl, endEl) {
+		if (startEl.type === Node.LITERAL && (endEl === void 0 || startEl.nextSibling == null)) {
+			return startEl;
+		}
 		var literal = new Node.Literal();
 		dom_insertBefore(startEl, literal);
 
-		var str = '', el = startEl;
-		while(el !== endEl) {
+		var str = '',
+			el = startEl,
+			end = endEl === void 0 ? el.nextSibling : endEl;
+		while(el !== end) {
 			str += el.toString();
-			if (el.type === Node.GROUP && literal.groupNum == null) {
+			if (el.groupNum != null && (literal.groupNum == null || literal.groupNum > el.groupNum)) {
 				literal.groupNum = el.groupNum;
 			}
-
 			dom_removeChild(el);
 			el = literal.nextSibling;
 		}
+		if (str === '?=') {
+			var next = literal.nextSibling;
+			dom_removeChild(literal);
+			return next;
+		}
 		literal.textContent = str;
 		literal.flags = startEl.flags || (startEl.firstChild && startEl.firstChild.flags);
-		return literal;
-	}
-
-	function joinSingleNodeInLiteral(node) {
-		var literal = new Node.Literal();
-		literal.textContent = node.toString();
-		literal.flags = node.flags || (node.firstChild && node.firstChild.flags);
-		literal.groupNum = node.groupNum;
-
-		dom_insertBefore(node, literal);
-		dom_removeChild(node);
 		return literal;
 	}
 

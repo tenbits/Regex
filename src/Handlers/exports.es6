@@ -21,6 +21,7 @@ var Handlers;
 	// import Groups/NamedGroup.es6
 	// import Groups/LookbehindGroup.es6
 	// import Groups/LookaheadGroup.es6
+	// import Groups/OptionalGroup.es6
 
 	// import Possessive.es6
 	// import Literals/NamedBackreference.es6
@@ -35,6 +36,7 @@ var Handlers;
 	// import Anchors/InputLastMatch.es6
 	// import Static/GAnchor.es6
 	// import Static/BAnchor.es6
+	// import Static/StartEnd.es6
 
 	var handler_GROUP = 0,
 		handler_LITERAL = 1,
@@ -49,7 +51,7 @@ var Handlers;
 		[handler_GROUP, LookbehindGroup],
 		[handler_GROUP, LookaheadGroup],
 		[handler_NODE, PossessiveGroup],
-		[handler_NODE, PossessiveLiteral],
+		[handler_LITERAL, PossessiveLiteral],
 		[handler_LITERAL, UnicodeCodePoint],
 		[handler_LITERAL, UnicodeCategory],
 		[handler_LITERAL, PosixCharClass],
@@ -58,6 +60,7 @@ var Handlers;
 		[handler_LITERAL, InputEnd],
 		[handler_LITERAL, InputEndWithNewLine],
 		[handler_LITERAL, InputLastMatch],
+		[handler_LITERAL, StartEndStatic],
 	];
 
 	var BeforeIndexed = [
@@ -71,8 +74,8 @@ var Handlers;
 	];
 
 	var AfterCombined = [
-
-	]
+		[handler_NODE, OptionalGroup]
+	];
 
 
 	function walk(root, handlers) {
@@ -114,6 +117,9 @@ var Handlers;
 				return null;
 			}
 			var child = node.firstChild;
+			if (child == null) {
+				return;
+			}
 			if (child.type !== Node.LITERAL) {
 				return null;
 			}

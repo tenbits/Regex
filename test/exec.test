@@ -249,12 +249,122 @@ UTest({
 		eq_(match.index, 3);
 	},
 
-	'!should find keyword' () {
-		var rgx = new Regex('(?x)\n\t\t\t\t(?<![\\.\\$])\\b(\n\t\t\t\t\tbreak|by|catch|continue|else|finally|for|in|of|if|return|switch|\n\t\t\t\t\tthen|throw|try|unless|when|while|until|loop|do|(?<=for)\\s+own\n\t\t\t\t)(?!\\s*:)\\b\n\t\t\t');
-		console.log(rgx.root.toString());
+	'should find keyword' () {
+		//var rgx = new Regex("(?<![\\.\\$])\\b(break|by|catch|continue|else|finally|for|in|of|if|return|switch|then|throw|try|unless|when|while|until|loop|do|(?<=for)\s+own)(?!\\s*:)\\b");
+		var rgx = new Regex("(?<![\\.\\$])\\b(break|by|catch|continue|else|finally|for|in|of|if|return|switch|then|throw|try|unless|when|while|until|loop|do|(?<=for)\\s+own)(?!\\s*:)\\b");
 
 		var match = rgx.match('return');
 		eq_(match.value, 'return');
+	},
+	'should find with possessive group' () {
+		var rgx = new Regex("(?:(?=\\s)(?:(?<=else|new|return)|(?<!\\w))(\\s+))?(\\b(?!(while|for|do|if|else|switch|catch|enumerate|return|r?iterate)\\s*\\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b|::)++)\\s*(\\()");
+		var match = rgx.match("return for();");
+		eq_(match, null);
+	},
+	'should match hyperlink' () {
+		var rgx = new Regex("((https?|s?ftp|ftps|file|smb|afp|nfs|(x-)?man(-page)?|gopher|txmt|issue):\/\/|mailto:)[-:@a-zA-Z0-9_.,~%+\/?=&#;]+(?<![-.,?:#;])");
+		var match = rgx.match('http://github.com');
+		eq_(match.value, 'http://github.com');
+	},
+	'should match but not at the beginning' () {
+		//var rgx = new Regex("(?:^|(?:(?=\\s)(?<!else|new|return)(?<=\\w)|(?=\\s*[A-Za-z_])(?<!&&)(?<=[*&>])))(\\s*)(?!(if)\\s*\\()((?:[A-Za-z_][A-Za-z0-9_]*+|::)++|(?:(?<=operator)(?:[-*&<>=+!]+|\\(\\)|\\[\\])))\\s*(?=\\()")
+		var rgx = new Regex("(?:^|(?:(?<!else)))(?!if)")
+		var match = rgx.exec("if(1){m()}\n");
+		eq_(match.index, 1);
+	},
+	'should handle start-end of line' : {
+		'match' () {
+			var rgx = new Regex("^$");
+			var match = rgx.exec('foo\n\nbar');
+			eq_(match.index, 4);
+		},
+		'unmatch' () {
+			var rgx = new Regex("^$");
+			var match = rgx.match('last\n');
+			eq_(match, null);
+		}
+	},
+	'should match single group' () {
+		var rgx = new Regex("^(ifeq|ifneq)(?=\\s)");
+		var match = rgx.match("ifeq   	");
+		deepEq_(match.groups, [
+			{
+				value: 'ifeq',
+				index: 0
+			}
+		]);
+	},
+	'should parse regex' () {
+		var rgx = new Regex("(:)\\b(link|visited|hover|active|focus|target|lang|disabled|enabled|checked|indeterminate|root|nth-child()|nth-last-child()|nth-of-type()|nth-last-of-type()|first-child|last-child|first-of-type|last-of-type|only-child|only-of-type|empty|not|valid|invalid)(\\([0-9A-Za-z]*\\))?")
+		var match = rgx.match('a:visited { }');
+		eq_(match.value, ':visited');
+		eq_(match.index, 1);
+		var groups = match.groups;
+		eq_(groups.length, 7);
+
+		eq_(groups[0].value, ':');
+		eq_(groups[0].index, 1);
+		eq_(groups[1].value, 'visited');
+		eq_(groups[1].index, 2);
+
+		groups.slice(2).forEach(x => {
+			eq_(x.value, null);
+			eq_(x.index, 9);
+		});
+
+		var match = rgx.match('div, a:nth-of-type(2n) {}', 1);
+		eq_(match.value, ':nth-of-type(2n)');
+		eq_(match.index, 6);
+		var groups = match.groups;
+		eq_(groups.length, 7);
+
+		eq_(groups[0].value, ':');
+		eq_(groups[0].index, 6);
+		eq_(groups[1].value, 'nth-of-type');
+		eq_(groups[1].index, 7);
+
+		groups.slice(2, 4).forEach(x => {
+			eq_(x.value, null);
+			eq_(x.index, 7);
+		});
+		eq_(groups[6].value, '(2n)');
+		eq_(groups[6].index, 18);
+	},
+	'should find method name' () {
+		//var regex = new Regex("(?:(?=\\s)(?:(?<=else|new|return)|(?<!\\w))(\\s+))?(\\b(?!(while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b|::)++)\\s*(\\()");
+		var regex = new Regex("(?x) (?: (?= \\s )  (?:(?<=else|new|return) | (?<!\\w)) (\\s+))?\n\t\t\t(\\b \n\t\t\t\t(?!(while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b | :: )++                  # actual name\n\t\t\t)\n\t\t\t \\s*(\\()");
+
+		var match = regex.match("if(1){m()}", 0);
+		check(match);
+
+		var match = regex.match("if(1){m()}\n", 6);
+		check(match);
+
+		function check(match) {
+			eq_(match.value, 'm(');
+			eq_(match.index, 6);
+
+			var groups = match.groups;
+			eq_(groups.length, 4);
+			eq_(groups[0], null);
+			eq_(groups[1].value, 'm');
+			eq_(groups[1].index, 6);
+			eq_(groups[2], null);
+			eq_(groups[3].value, '(');
+			eq_(groups[3].index, 7);
+		}
+	},
+	'should find numeric value' () {
+		var regex = new Regex("(?x:         # turn on extended mode\n\t\t\t             -?         # an optional minus\n\t\t\t             (?:\n\t\t\t               0        # a zero\n\t\t\t               |        # ...or...\n\t\t\t               [1-9]    # a 1-9 character\n\t\t\t               \\d*      # followed by zero or more digits\n\t\t\t             )\n\t\t\t             (?:\n\t\t\t               (?:\n\t\t\t                 \\.     # a period\n\t\t\t                 \\d+    # followed by one or more digits\n\t\t\t               )?\n\t\t\t               (?:\n\t\t\t                 [eE]   # an e character\n\t\t\t                 [+-]?  # followed by an option +/-\n\t\t\t                 \\d+    # followed by one or more digits\n\t\t\t               )?       # make exponent optional\n\t\t\t             )?         # make decimal portion optional\n\t\t\t           )")
+		var match = regex.match('{"foo": 1}');
+		eq_(match.value, 1);
+		eq_(match.index, 8);
+	},
+	'!should find function' () {
+		//var regex = new Regex("(?<=^|\\s)(?=@?[a-zA-Z\\$_])(@?[a-zA-Z\\$_](\\w|\\$|:|\\.)*\s*(?=[:=](\\s*\\(.*\\))?\\s*([=-]>)))")
+		var regex = new Regex("(?<=^|\\s)(?=@?[a-zA-Z\\$_])(@?[a-zA-Z\\$_](\\w|\\$|:|\\.)*\s*(?=[:=](\\s*\\(.*\\))?\\s*([=-]>)))")
+		var match = regex.match("  destroy: ->", 2);
+		console.log(match);
 	}
 });
 

@@ -74,7 +74,18 @@ var ast_combineNatives,
 	ast_indexShadowedGroups = function(root) {
 		var groupNum = 0, shadowGroupNum = 0;
 		root.groupNumMapping = {};
-		visitor_walkByType(root, Node.GROUP, node => {
+		visitor_walkEx(root, node => {
+			if (node.type !== Node.GROUP) {
+				return;
+			}
+			if (node.isIncluded === false) {
+				visitor_walkByType(node, Node.GROUP, child => {
+					if (child.isIncluded === true && child.isCaptured === true) {
+						++groupNum;
+					}
+				});
+				return { deep: false };
+			}
 			if (node.isCaptured === false) {
 				return;
 			}
