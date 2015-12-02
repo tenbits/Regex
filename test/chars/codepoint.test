@@ -1,7 +1,0 @@
-UTest({
-	'should match code point' () {
-		var rgx = new Regex('\\x{200D}');
-		var match = rgx.match('oo \u200D 5');
-		eq_(match.index, 3);
-	}
-})
