@@ -250,9 +250,7 @@ UTest({
 	},
 
 	'should find keyword' () {
-		//var rgx = new Regex("(?<![\\.\\$])\\b(break|by|catch|continue|else|finally|for|in|of|if|return|switch|then|throw|try|unless|when|while|until|loop|do|(?<=for)\s+own)(?!\\s*:)\\b");
 		var rgx = new Regex("(?<![\\.\\$])\\b(break|by|catch|continue|else|finally|for|in|of|if|return|switch|then|throw|try|unless|when|while|until|loop|do|(?<=for)\\s+own)(?!\\s*:)\\b");
-
 		var match = rgx.match('return');
 		eq_(match.value, 'return');
 	},
@@ -267,7 +265,6 @@ UTest({
 		eq_(match.value, 'http://github.com');
 	},
 	'should match but not at the beginning' () {
-		//var rgx = new Regex("(?:^|(?:(?=\\s)(?<!else|new|return)(?<=\\w)|(?=\\s*[A-Za-z_])(?<!&&)(?<=[*&>])))(\\s*)(?!(if)\\s*\\()((?:[A-Za-z_][A-Za-z0-9_]*+|::)++|(?:(?<=operator)(?:[-*&<>=+!]+|\\(\\)|\\[\\])))\\s*(?=\\()")
 		var rgx = new Regex("(?:^|(?:(?<!else)))(?!if)")
 		var match = rgx.exec("if(1){m()}\n");
 		eq_(match.index, 1);
@@ -331,9 +328,7 @@ UTest({
 		eq_(groups[6].index, 18);
 	},
 	'should find method name' () {
-		//var regex = new Regex("(?:(?=\\s)(?:(?<=else|new|return)|(?<!\\w))(\\s+))?(\\b(?!(while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b|::)++)\\s*(\\()");
 		var regex = new Regex("(?x) (?: (?= \\s )  (?:(?<=else|new|return) | (?<!\\w)) (\\s+))?\n\t\t\t(\\b \n\t\t\t\t(?!(while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b | :: )++                  # actual name\n\t\t\t)\n\t\t\t \\s*(\\()");
-
 		var match = regex.match("if(1){m()}", 0);
 		check(match);
 
@@ -349,10 +344,15 @@ UTest({
 			eq_(groups[0], null);
 			eq_(groups[1].value, 'm');
 			eq_(groups[1].index, 6);
-			eq_(groups[2], null);
+			eq_(groups[2].value, null);
 			eq_(groups[3].value, '(');
 			eq_(groups[3].index, 7);
 		}
+	},
+	'should unmatch' () {
+		var regex = new Regex("(?x)\n    \t\t(?:  ^                                 # begin-of-line\n    \t\t  |  \n    \t\t     (?: (?= \\s )           (?<!else|new|return) (?<=\\w)      #  or word + space before name\n    \t\t       | (?= \\s*[A-Za-z_] ) (?<!&&)       (?<=[*&>])   #  or type modifier before name\n    \t\t     )\n    \t\t)\n    \t\t(\\s*) (?!(while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()\n    \t\t(\n    \t\t\t(?: [A-Za-z_][A-Za-z0-9_]*+ | :: )++ |                  # actual name\n    \t\t\t(?: (?<=operator) (?: [-*&<>=+!]+ | \\(\\) | \\[\\] ) )  # if it is a C++ operator\n    \t\t)\n    \t\t \\s*(?=\\()");
+		var match = regex.match("if(1){m()}\n", 2);
+		eq_(match, null);
 	},
 	'should find numeric value' () {
 		var regex = new Regex("(?x:         # turn on extended mode\n\t\t\t             -?         # an optional minus\n\t\t\t             (?:\n\t\t\t               0        # a zero\n\t\t\t               |        # ...or...\n\t\t\t               [1-9]    # a 1-9 character\n\t\t\t               \\d*      # followed by zero or more digits\n\t\t\t             )\n\t\t\t             (?:\n\t\t\t               (?:\n\t\t\t                 \\.     # a period\n\t\t\t                 \\d+    # followed by one or more digits\n\t\t\t               )?\n\t\t\t               (?:\n\t\t\t                 [eE]   # an e character\n\t\t\t                 [+-]?  # followed by an option +/-\n\t\t\t                 \\d+    # followed by one or more digits\n\t\t\t               )?       # make exponent optional\n\t\t\t             )?         # make decimal portion optional\n\t\t\t           )")
@@ -360,11 +360,43 @@ UTest({
 		eq_(match.value, 1);
 		eq_(match.index, 8);
 	},
-	'!should find function' () {
-		//var regex = new Regex("(?<=^|\\s)(?=@?[a-zA-Z\\$_])(@?[a-zA-Z\\$_](\\w|\\$|:|\\.)*\s*(?=[:=](\\s*\\(.*\\))?\\s*([=-]>)))")
-		var regex = new Regex("(?<=^|\\s)(?=@?[a-zA-Z\\$_])(@?[a-zA-Z\\$_](\\w|\\$|:|\\.)*\s*(?=[:=](\\s*\\(.*\\))?\\s*([=-]>)))")
+	'should find function' () {
+		var regex = new Regex("(?<=^|\\s)(?=@?[a-zA-Z\\$_])(@?[a-zA-Z\\$_](\\w|\\$|:|\\.)*\\s*(?=[:=](\\s*\\(.*\\))?\\s*([=-]>)))")
 		var match = regex.match("  destroy: ->", 2);
-		console.log(match);
+
+		eq_(match.value, 'destroy');
+		eq_(match.index, 2);
+		eq_(match.groups.length, 4);
+		eq_(match.groups[0].value, 'destroy');
+		eq_(match.groups[0].index, 2);
+		eq_(match.groups[1].value, 'y');
+		eq_(match.groups[1].index, 8);
+		eq_(match.groups[2].value, null);
+		eq_(match.groups[3].value, '->');
+		eq_(match.groups[3].index, 11);
+	},
+
+	'should match function (php)' () {
+		var regex = new Regex("\\s*((?:(?:final|abstract|public|private|protected|static)\\s+)*)(function)(?:\\s+|(\\s*&\\s*))(?:(__(?:call|construct|destruct|get|set|isset|unset|tostring|clone|set_state|sleep|wakeup|autoload|invoke|callStatic))|([a-zA-Z0-9_]+))\\s*(\\()");
+		var match = regex.match("function hello() {}");
+		eq_(match.value, 'function hello(');
+		eq_(match.index, 0);
+		eq_(match.groups[0].value, '');
+		eq_(match.groups[0].index, 0);
+		eq_(match.groups[1].value, 'function');
+		eq_(match.groups[1].index, 0);
+		eq_(match.groups[2].value, null);
+		eq_(match.groups[3].value, null);
+		eq_(match.groups[4].value, 'hello');
+		eq_(match.groups[4].index, 9);
+		eq_(match.groups[5].value, '(');
+		eq_(match.groups[5].index, 14);
+	},
+
+	'should unmatch class' () {
+		var regex = new Regex("(?x)\n\t\t\t\tand=|or=|!|%|&|\\^|\\*|\\/|(\\-)?\\-(?!>)|\\+\\+|\\+|~|==|=(?!>)|!=|<=|>=|<<=|>>=|\n\t\t\t\t>>>=|<>|<|>|!|&&|\\.\\.(\\.)?|\\?|\\||\\|\\||\\:|\\*=|(?<!\\()/=|%=|\\+=|\\-=|&=|\n\t\t\t\t\\^=|\\b(?<![\\.\\$])(instanceof|new|delete|typeof|and|or|is|isnt|not|super)\\b\n\t\t\t");
+		var match = regex.match("class Quicksort");
+		eq_(match, null);
 	}
 });
 

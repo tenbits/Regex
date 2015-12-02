@@ -3,91 +3,136 @@ var RegexNode;
 	RegexNode = class_create(Literal, {
 		type: type_Regex,
 
-		rgxSearch: null,
-		rgxFixed: null,
 		rgxIndexer: null,
 		domIndexer: null,
 
+		rgxIndexerSearch: null,
+		rgxIndexerSticky: null,
+
 		groupNum: null,
-		root: null,
+		groupCount: null,
+
+		hasInvisible: false,
+		isLazy: false,
+		isBacktracked: false,
 
 		constructor (text, node) {
 			var flags = node.serializeFlags();
 			if (flags.indexOf('g') === -1) {
 				flags += 'g';
 			}
-			this.rgxSearch = new RegExp(this.textContent, flags);
-
-			flags = flags.replace(/[gm]/g, '');
-			this.rgxFixed = new RegExp('^' + this.textContent, flags);
-			this.compileIndexer(flags);
+			this.createIndexed_(flags);
 			this.groupNum = node.groupNum;
-			this.isBacktracked = hasRepetition(text);
+			this.isLazy = hasRepetition(text);
+			this.isBacktracked = this.isLazy;
 		},
-
 		exec (str_, i, opts) {
 			var str = str_;
 			if (this.cursor != null) {
-				str = str.substring(0, this.cursor.index + this.cursor.value.length - 1);
+				if (--this.cursor.end < this.cursor.start) {
+					this.cursor = null;
+					return null;
+				}
+				str = str.substring(this.cursor.start, this.cursor.end);
 			}
 			var regex, match, matchIndex;
 			if (opts.fixed) {
 				var sub = str.substring(i);
-				match = this.rgxFixed.exec(sub);
+				match = this.rgxIndexerSticky.exec(sub);
 				if (match == null) {
 					this.cursor = null;
 					return null;
 				}
 				matchIndex = i;
 			} else {
-				this.rgxSearch.lastIndex = i;
-				match = this.rgxSearch.exec(str);
+				this.rgxIndexerSearch.lastIndex = i;
+				match = this.rgxIndexerSearch.exec(str);
 				if (match == null) {
 					this.cursor = null;
 					return null;
 				}
 				matchIndex = match.index;
 			}
-			if (this.isBacktracked) {
+			if (this.isBacktracked === true && this.cursor == null) {
 				this.cursor = {
-					value: match[0],
-					index: matchIndex
+					start: matchIndex,
+					end: matchIndex + match[0].length
 				};
 			}
-
-			var iMatch = this.resolveMatches(match, matchIndex, opts);
-			return iMatch;
+			var value = resolveIndexedMatchValue(this, this.domIndexer, match);
+			return new MatchInternal(
+				matchIndex,
+				value,
+				this,
+				match
+			);
 		},
 
-		resolveMatches (nativeMatch, matchIndex, opts) {
+		getGroups (match, matchIndex) {
+			return resolveIndexedMatchGroups(this, match, matchIndex);
+		},
+
+		getMatch (indexedMatch) {
 			var match = new Match();
-			match.value = nativeMatch[0];
-			match.index = matchIndex;
+			match.value = '';
+			match.index = indexedMatch.index;
+			match.groups = new Array(this.groupCount);
 			match.groupNum = this.groupNum;
 
-			if (match.value === '') {
+			if (this.groupCount === 0) {
+				match.value = indexedMatch[0];
 				return match;
 			}
-
-			var nativeIndexerMatch = this.rgxIndexer.exec(match.value);
-			if (nativeIndexerMatch[0] !== match.value) {
-				throw Error(`Indexer root missmatch ${nativeIndexerMatch[0]} ${match.value}`);
-			}
-
-			if (opts && opts.indexed === false) {
-				resolveGroups(match, nativeMatch, matchIndex);
-			} else if (nativeMatch.length > 1) {
-				resolveIndexedGroups(match, nativeMatch, nativeIndexerMatch, this.domIndexer, matchIndex);
-			}
+			match.groups = resolveIndexedMatchGroups(
+				this,
+				indexedMatch.match
+			);
 			return match;
 		},
 
-		compileIndexer (flags) {
-			var root = parser_parseGroups(this.textContent);
+		createIndexed_ (flags) {
+			this.createIndexerDom_();
+			this.wrapGroups_();
 
-			Handlers.define(root);
+			ast_indexShadowedGroups(this.domIndexer);
 
-			visitor_walkUp(root, node => {
+			this.adjustBacktracks_();
+
+			var regex = this.domIndexer.toString();
+			this.rgxIndexerSearch = new RegExp(regex, flags);
+			this.rgxIndexerSticky = new RegExp('^' + regex, flags.replace(/[gm]/g, ''));
+		},
+
+		createIndexerDom_ () {
+			this.domIndexer = parser_parseGroups(this.textContent);
+			visitor_walkByType(this.domIndexer, Node.LITERAL, (node) => {
+				var parent = node.parentNode;
+				if (parent.firstChild !== node || parent.type !== Node.GROUP) {
+					return;
+				}
+				var str = node.textContent;
+				var c = str.charCodeAt(0);
+				if (c !== 63) {
+					// ?
+					return;
+				}
+				c = str.charCodeAt(1);
+				if (c === 61 || c === 33) {
+					// =:
+					//node.textContent = '?:' + str.substring(2);
+					parent.isIncluded = false;
+					parent.isCaptured = false;
+					//this.hasInvisible = true;
+				}
+				if (c === 58) {
+					// :
+					parent.isCaptured = false;
+				}
+			});
+		},
+
+		wrapGroups_ () {
+			visitor_walkUp(this.domIndexer, node => {
 				if (node.type === Node.OR) {
 					return;
 				}
@@ -95,18 +140,28 @@ var RegexNode;
 				if (parent.firstChild === parent.lastChild) {
 					return;
 				}
-				if (node.checkIncluded() === false) {
-					return;
-				}
 				if (node.type === Node.GROUP) {
-					if (node.repetition == null && node.isCaptured !== false) {
+					if (node.repetition === '' && node.isCaptured === true) {
 						return;
 					}
 				}
 				if (node.type === Node.LITERAL) {
 					var txt = node.textContent;
-					if (txt === '\\b') {
+					if (txt === '\\b' || txt === '^' || txt === '$') {
 						return;
+					}
+					var c = txt.charCodeAt(0);
+					if (c === 63 /* ? */) {
+						c = txt.charCodeAt(1);
+						if (c === 58 || c === 61 || c === 33) {
+							//:=!
+							if (txt.length > 2) {
+								var literal = new Node.Literal(txt.substring(2));
+								dom_insertAfter(node, literal);
+							}
+							node.textContent = txt.substring(0, 2);
+							return;
+						}
 					}
 				}
 
@@ -115,72 +170,93 @@ var RegexNode;
 
 				dom_insertBefore(node, group);
 				dom_removeChild(node);
-				group.appendChild(node);
+				dom_appendChild(group, node);
 				return group;
 			});
+		},
 
-			ast_indexShadowedGroups(root);
-			visitor_walk(root, function(node){
-				if (node.isIncluded === false) {
-					var next = node.nextSibling;
-					dom_removeChild(node);
-					return next;
-					return;
-				}
+		adjustBacktracks_ () {
+			var mappings = this.domIndexer.groupNumMapping;
+			visitor_walkByType(this.domIndexer, Node.LITERAL, node => {
+				node.textContent = node.textContent.replace(rgx_groupBacktrack, (full, c, num) => {
+					return c + '\\' + mappings[+num];
+				});
 			});
-
-			var regex = root.toString();
-			if (rgx_groupBacktrack.test(regex)) {
-				regex = adjust_groupBacktracks(root, regex);
-			}
-			this.rgxIndexer = new RegExp(regex, flags);
-			this.domIndexer = root;
 		}
 	});
 
-	function adjust_groupBacktracks(root, str){
-		var mappings = root.groupNumMapping;
-		return str.replace(rgx_groupBacktrack, function(full, c, num){
-			return c + '\\' + mappings[+num];
-		});
-	}
-
-	function resolveGroups(match, nativeMatch, pos) {
-		var imax = nativeMatch.length,
-			i = 0;
-		while ( ++ i < imax ) {
-			var group = new MatchGroup();
-			group.value = nativeMatch[i];
-			match.groups[i - 1] = group;
+	var resolveIndexedMatchValue;
+	(function(){
+		resolveIndexedMatchValue = function(regexNode, domIndexer, match) {
+			if (regexNode.hasInvisible === false) {
+				return match[0];
+			};
+			return resolve(domIndexer, match);
+		};
+		function resolve(node, nativeMatch) {
+			var str = '';
+			for(var el = node.firstChild; el != null; el = el.nextSibling) {
+				if (el.isIncluded === false) {
+					continue;
+				}
+				if (isPartialIncluded(el)) {
+					str += resolve(el, nativeMatch);
+					continue;
+				}
+				if (el.shadowGroupNum == null) {
+					str += resolve(el, nativeMatch);
+					continue;
+				}
+				str += nativeMatch[el.shadowGroupNum];
+			}
+			return str;
 		}
-		return match;
-	}
-	function resolveIndexedGroups(match, nativeMatch, nativeIndexerMatch, node, pos) {
-		if (node.groupNum != null && node.groupNum !== 0) {
-			var shadowMatch = nativeIndexerMatch[node.shadowGroupNum];
-			var actualMatch = nativeMatch[node.groupNum];
-			if (actualMatch !== shadowMatch) {
-				throw Error(`Indexer group missmatch: ${actualMatch} ~~ ${shadowMatch}`);
+		function isPartialIncluded(node) {
+			for (var el = node.firstChild; el != null; el = el.nextSibling) {
+				if (el.isIncluded === false || isPartialIncluded(el) === true) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}());
+
+	var resolveIndexedMatchGroups;
+	(function(){
+		resolveIndexedMatchGroups = function(regexNode, match, matchIndex) {
+			var groups = [];
+			resolve(regexNode.domIndexer, match, matchIndex, groups);
+			return groups;
+		};
+		function resolve(node, nativeMatch, pos, groups, parentGroup) {
+			var group;
+			if (node.groupNum != null && node.groupNum !== 0) {
+				var value = nativeMatch[node.shadowGroupNum];
+				group = new MatchGroup();
+				group.value = value;
+				group.index = pos;
+				groups[node.groupNum - 1] = group;
+
+				if (value != null && node.repetition !== '' && parentGroup != null) {
+					group.index += parentGroup.value.length - value.length - 1;
+				}
 			}
 
-			var group = new MatchGroup();
-			group.value = actualMatch;
-			group.index = pos;
-			match.groups[node.groupNum - 1] = group;
-		}
+			var nextPos = pos;
+			for (var el = node.firstChild; el != null; el = el.nextSibling) {
+				var next = resolve(el, nativeMatch, nextPos, groups, group || parentGroup);
+				if (el.isIncluded !== false) {
+					nextPos = next;
+				}
+			}
 
-		var nextPos = pos;
-		for (var el = node.firstChild; el != null; el = el.nextSibling) {
-			nextPos = resolveIndexedGroups(match, nativeMatch, nativeIndexerMatch, el, nextPos);
+			if (node.shadowGroupNum != null && node.shadowGroupNum !== 0) {
+				var value = nativeMatch[node.shadowGroupNum] || '';
+				pos = pos + value.length;
+			}
+			return pos;
 		}
-
-		if (node.shadowGroupNum != null && node.shadowGroupNum !== 0) {
-			var value = nativeIndexerMatch[node.shadowGroupNum] || '';
-			pos = pos + value.length;
-		}
-		return pos;
-	}
-
+	}());
 
 	function hasRepetition(str) {
 		var imax = str.length,
@@ -202,5 +278,4 @@ var RegexNode;
 	}
 
 	var rgx_groupBacktrack = /(^|[^\\])\\(\d+)/g;
-
-}())
+}());

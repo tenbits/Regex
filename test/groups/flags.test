@@ -2,7 +2,7 @@ UTest({
 	'case(-less)' () {
 		console.log('Multiple FLAGS support is temporarly disabled');
 		return;
-	
+
 		[
 			'(?i)a(?-i)b(?i)c',
 			'(?i)a(?-i:b)c'
@@ -39,9 +39,7 @@ UTest({
 		})
 	},
 	'should parse regex' () {
-		var rgx = new Regex(
-		"(?x)\n\t\t\t\t( (https?|s?ftp|ftps|file|smb|afp|nfs|(x-)?man(-page)?|gopher|txmt|issue)://|mailto:)\n\t\t\t\t[-:@a-zA-Z0-9_.,~%+/?=&#;]+(?<![-.,?:#;])\n\t\t\t");
-
+		var rgx = new Regex("(?x)\n\t\t\t\t( (https?|s?ftp|ftps|file|smb|afp|nfs|(x-)?man(-page)?|gopher|txmt|issue)://|mailto:)\n\t\t\t\t[-:@a-zA-Z0-9_.,~%+/?=&#;]+(?<![-.,?:#;])\n\t\t\t");
 		var match = rgx.match('x-man-page://foo.baz?');
 		eq_(match.value, 'x-man-page://foo.baz');
 	}

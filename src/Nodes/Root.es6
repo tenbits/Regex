@@ -13,14 +13,34 @@ var Root = class_create(Block, {
 
 	exec (str, i) {
 		var opts = new exec_Opts;
-		opts.indexed = false;
-		return exec_root(this, str, i, opts);
+		var internal = exec_root(this, str, i, opts);
+		if (internal == null) {
+			return null;
+		}
+		var match = internal.toMatch();
+		var groups = match.groups,
+			imax = groups.length + 1,
+			i = 0,
+			arr = new Array(imax),
+			x;
+		while(++i < imax) {
+			x = groups[i - 1];
+			arr[i] = x && x.value;
+		}
+		arr[0] = match.value;
+		arr.index = match.index;
+		arr.groups = {};
+		return arr;
 	},
 
 	match (str, i) {
 		var opts = new exec_Opts;
 		opts.indexed = true;
-		return exec_root(this, str, i, opts);
+		var match = exec_root(this, str, i, opts);
+		if (match == null) {
+			return null;
+		}
+		return match.toMatch();
 	},
 
 	groups: null,

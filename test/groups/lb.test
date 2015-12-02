@@ -4,7 +4,7 @@ UTest({
 		var rgx = new Regex('(?<=a)([pr])');
 		var match = rgx.match('cbagpdapr');
 
-		deepEq_(match, {
+		has_(match, {
 			value: 'p',
 			index: 7,
 			groups: [

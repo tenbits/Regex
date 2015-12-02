@@ -6,10 +6,9 @@ var exec_root,
 
 	exec_root = function (root, str, i, opts_) {
 		backtrack_clearCursors(root);
-
+		debugger;
 		var opts = new exec_Opts(opts_);
 		opts.lastIndex = i;
-debugger;
 		var match = exec_children(root, str, i, opts);
 		if (match == null) {
 			return null;
@@ -37,30 +36,8 @@ debugger;
 			}
 		}
 
-		var response = match;
-		if (opts && opts.indexed === false) {
-			var groups = match.groups,
-				imax = groups.length + 1,
-				i = 0,
-				arr = new Array(imax),
-				x;
-			while(++i < imax) {
-				x = groups[i - 1];
-				arr[i] = x && x.value;
-			}
-			arr[0] = match.value;
-			arr.index = match.index;
-			arr.groups = {};
-			response = arr;
-		}
-		if (root.groups) {
-			for (var key in root.groups) {
-				var num = root.groups[key];
-				var group = match.groups[num - 1];
-				response.groups[key] = group && group.value;
-			}
-		}
-		return response;
+		match.namedGroups = root.groups;
+		return match;
 	};
 
 	exec_children = function(node, str, i_, opts_, start, end) {
@@ -76,7 +53,7 @@ debugger;
 				: null;
 
 		while(el != end) {
-			if (i >= imax) {
+			if (i > imax) {
 				return null;
 			}
 			var matcher = Matchers[el.type];
@@ -84,18 +61,19 @@ debugger;
 			if (match == null) {
 				if (backtracking.length !== 0) {
 					var track = backtracking.pop();
-					i = ++track.strI;
+					i = track.strI;
 					el = track.el;
 					matches.splice(track.matchI);
 					opts = track.opts;
+
+					if (el.isLazy !== true) {
+						i++;
+					}
 					continue;
 				}
 
 				if (search && matches.length !== 0) {
-					i = ++search.strI;
-					if (i >= imax) {
-						return null;
-					}
+					i = search.strI + 1;
 					el = search.el;
 					matches.length = 0;
 					opts = search.opts;
@@ -123,7 +101,7 @@ debugger;
 			opts.fixed = true;
 			el = el.nextSibling;
 		}
-		return matches_join(matches);
+		return matches_joinInternal(matches);
 	};
 
 	exec_clearCursors = backtrack_clearCursors;
@@ -170,12 +148,12 @@ debugger;
 			if (match == null) {
 				return null;
 			}
-			if (group.isCaptured !== false && group.isIncluded !== false) {
-				var group = new MatchGroup();
-				group.value = match.value;
-				group.index = match.index;
-				match.groups.unshift(group);
-			}
+			//if (group.isCaptured !== false && group.isIncluded !== false) {
+			//	var group = new MatchGroup();
+			//	group.value = match.value;
+			//	group.index = match.index;
+			//	match.groups.unshift(group);
+			//}
 			return match;
 
 			//for(var el = group.parentNode; el != null ; el = el.parentNode) {
@@ -256,6 +234,10 @@ debugger;
 			out.groups = out.groups.concat(groups);
 		}
 		return out;
+	}
+
+	function matches_joinInternal(matches) {
+		return new MatchInternalCollection(matches);
 	}
 
 	function matches_joinArray(matches) {

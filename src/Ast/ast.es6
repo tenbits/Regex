@@ -78,14 +78,14 @@ var ast_combineNatives,
 			if (node.type !== Node.GROUP) {
 				return;
 			}
-			if (node.isIncluded === false) {
-				visitor_walkByType(node, Node.GROUP, child => {
-					if (child.isIncluded === true && child.isCaptured === true) {
-						++groupNum;
-					}
-				});
-				return { deep: false };
-			}
+			//if (node.isIncluded === false) {
+			//	visitor_walkByType(node, Node.GROUP, child => {
+			//		if (child.isIncluded === true && child.isCaptured === true) {
+			//			++groupNum;
+			//		}
+			//	});
+			//	return { deep: false };
+			//}
 			if (node.isCaptured === false) {
 				return;
 			}
