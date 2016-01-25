@@ -1,0 +1,15 @@
+{
+  "name": "atma-regex",
+  "description": "Enhanced Regular Expressions",
+  "author": {
+    "name": "Alexander Kit",
+    "email": "alex.kit@atmajs.com"
+  },
+  "version": "0.2.25",
+  "main": "./lib/regex.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tenbits/Regex.git"
+  },
+  "license": "MIT"
+}
