@@ -56,3 +56,54 @@ var rgx = new Regex('Name:\\s*(?<name>\\w+)');
 var match = rgx.mach('My Name: Baz');
 equals(match.groups.name, 'Baz');
 ```
+
+
+# API
+
+#### Npm/Bower
+
+```bash
+$ npm i atma-regex -s
+$ bower install atma-regex --save
+```
+
+```
+var Regex = require('atma-regex');
+var rgx = new Regex(pattern: string, flags: string);
+```
+
+
+#### `Regex::`
+
+
+- `exec(input:string, index: number = this.lastMatch): JsMatch`
+- `match(input:string, index: number = this.lastMatch): RegexMatch`
+- `matches(input:string): RegexMatch[]`
+- `lastIndex: number`
+
+
+##### `JsMatch::`
+
+[Javascript-compatible](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec) result object with additional properties:
+
+- `group:Object`: key-value matches
+
+##### `RegexMatch::`
+
+- `value:string`: full match
+- `index`: match index
+- `groups?: RegexMatch[]` Group matches with `value` and **`index`** information. 
+
+
+
+---
+:copyright: MIT
+
+
+
+
+
+
+
+
+
