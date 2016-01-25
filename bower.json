@@ -5,7 +5,7 @@
     "name": "Alexander Kit",
     "email": "alex.kit@atmajs.com"
   },
-  "version": "0.2.27",
+  "version": "0.2.28",
   "main": "./lib/regex.js",
   "repository": {
     "type": "git",
