@@ -44,3 +44,5 @@ UTest({
 		eq_(match.value, 'x-man-page://foo.baz');
 	}
 })
+
+// vim: set ft=js:

@@ -16,3 +16,5 @@ UTest({
 		eq_(rgx.lastIndex, 0);
 	},
 });
+
+// vim: set ft=js:

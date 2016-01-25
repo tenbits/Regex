@@ -48,3 +48,5 @@ UTest({
 		eq_(match.value, 'acd');
 	}
 })
+
+// vim: set ft=js:

@@ -28,3 +28,5 @@ UTest({
 		eq_(match.index, 1);
 	}
 });
+
+// vim: set ft=js:

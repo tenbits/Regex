@@ -9,3 +9,5 @@ UTest({
 		eq_(match.groups[0].index, 9);
 	}
 })
+
+// vim: set ft=js:

@@ -73,3 +73,5 @@
 		deepEq_(match, data.match);
 	}
 }());
+
+// vim: set ft=js:

@@ -38,3 +38,5 @@ UTest({
 		eq_(match.groups[0].index, 4);
 	}
 })
+
+// vim: set ft=js:

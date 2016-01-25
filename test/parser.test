@@ -51,3 +51,5 @@ UTest({
 		eq_(match.value, '"/');
 	}
 })
+
+// vim: set ft=js:

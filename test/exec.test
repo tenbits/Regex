@@ -418,3 +418,5 @@ function Assert(data) {
 
 	deepEq_(Array.from(arr), groups);
 }
+
+// vim: set ft=js:
