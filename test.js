@@ -1,0 +1,1 @@
+logger.log(io.File.read('package.json'));
