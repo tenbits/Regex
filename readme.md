@@ -106,11 +106,12 @@ var rgx = new Regex(pattern: string, flags: string);
 ```javascript
 var Regex = require('atma-regex');
 var rgx = new Regex('(?<=a)([pr])');
-var match = rgx.match('cbagpdapr');
+var match = rgx.match('-p--apa');
 
-console.log(match.value);
-console.log(match.index);
+console.log(`Matches '${match.value}' at pos #${match.index}`);
 ```
+
+[Live example](https://tonicdev.com/npm/atma-regex)
 
 _See more examples in tests_
 
